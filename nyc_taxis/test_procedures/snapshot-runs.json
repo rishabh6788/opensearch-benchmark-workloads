@@ -149,7 +149,7 @@
         "parallel": {
           "tasks": [
             {
-              "name": "restore-from-snapshot",
+              "name": "restore-from-snapshot-1",
               "operation": {
                 "operation-type": "restore-snapshot",
                 "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
@@ -163,7 +163,7 @@
               }
             },
             {
-              "name": "restore-from-snapshot",
+              "name": "restore-from-snapshot-2",
               "operation": {
                 "operation-type": "restore-snapshot",
                 "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
@@ -295,7 +295,7 @@
         "parallel": {
           "tasks": [
             {
-              "name": "restore-from-snapshot",
+              "name": "restore-from-snapshot-1",
               "operation": {
                 "operation-type": "restore-snapshot",
                 "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
@@ -309,7 +309,7 @@
               }
             },
             {
-              "name": "restore-from-snapshot",
+              "name": "restore-from-snapshot-2",
               "operation": {
                 "operation-type": "restore-snapshot",
                 "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
@@ -323,7 +323,7 @@
               }
             },
             {
-              "name": "restore-from-snapshot",
+              "name": "restore-from-snapshot-3",
               "operation": {
                 "operation-type": "restore-snapshot",
                 "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
@@ -337,7 +337,7 @@
               }
             },
             {
-              "name": "restore-from-snapshot",
+              "name": "restore-from-snapshot-4",
               "operation": {
                 "operation-type": "restore-snapshot",
                 "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
@@ -351,7 +351,7 @@
               }
             },
             {
-              "name": "restore-from-snapshot",
+              "name": "restore-from-snapshot-5",
               "operation": {
                 "operation-type": "restore-snapshot",
                 "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
