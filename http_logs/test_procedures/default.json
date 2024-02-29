@@ -252,7 +252,7 @@
             "operation-type": "force-merge",
             "max-num-segments": 1,
             "mode": "polling",
-            "request-timeout": 300
+            "request-timeout": 900
           }
         },
         {
