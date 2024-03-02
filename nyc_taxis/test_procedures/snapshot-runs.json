@@ -190,7 +190,7 @@
         "name": "check-cluster-health",
         "operation": {
           "operation-type": "cluster-health",
-          "index": "nyc_taxis",
+          "index": "nyc_taxis*",
           "request-params": {
             "wait_for_status": "{{cluster_health | default('green')}}",
             "wait_for_no_relocating_shards": "true"
@@ -378,7 +378,7 @@
         "name": "check-cluster-health",
         "operation": {
           "operation-type": "cluster-health",
-          "index": "nyc_taxis",
+          "index": "nyc_taxis*",
           "request-params": {
             "wait_for_status": "{{cluster_health | default('green')}}",
             "wait_for_no_relocating_shards": "true"
