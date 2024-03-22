@@ -1,67 +1,50 @@
-{% if distribution_version is defined and distribution_version > 2.11 and distribution_version < 6.0 %}
-  {% set match_only_text = "match_only_text" %}
-{% else %}
-  {% set match_only_text = "text" %}
-{% endif %}
-
 {
   "settings": {
     "index.number_of_shards": {{number_of_shards | default(1)}},
     "index.number_of_replicas": {{number_of_replicas | default(1)}},
     "index.queries.cache.enabled": {{query_cache_enabled | default(false) | tojson}},
     "index.requests.cache.enable": {{requests_cache_enabled | default(false) | tojson}},
-    {% if distribution_version is not defined or distribution_version < 6.0 %}
-      "index.merge.policy": "{{index_merge_policy | default('log_byte_size') }}",
-    {% endif %}
     "index.codec": "best_compression",
     "index.translog.sync_interval": "30s",
     "index.translog.durability": "async",
-    "index.query.default_field": [
-      "message"
-    ]
+    "index.query.default_field": [ "message" ]
   },
   "mappings": {
-    "_data_stream_timestamp": {
-      "enabled": true
-    },
-    {% if distribution_version is not defined or distribution_version < 6.0 %}
-      "dynamic_templates": [
-	{
-	  "match_ip": {
-	    "match": "ip",
-	    "match_mapping_type": "string",
-	    "mapping": {
-	      "type": "ip"
-	    }
-	  }
-	},
-	{
-	  "match_message": {
-	    "match": "message",
-	    "match_mapping_type": "string",
-	    "mapping": {
-	      "type": "{{ match_only_text }}"
-	    }
-	  }
-	},
-	{
-	  "strings_as_keyword": {
-	    "match_mapping_type": "string",
-	    "mapping": {
-	      "ignore_above": 1024,
-	      "type": "keyword"
-	    }
-	  }
-	}
-      ],
-    {% endif %}
+    "dynamic_templates": [
+      {
+        "match_ip": {
+          "match": "ip",
+          "match_mapping_type": "string",
+          "mapping": {
+            "type": "ip"
+          }
+        }
+      },
+      {
+        "match_message": {
+          "match": "message",
+          "match_mapping_type": "string",
+          "mapping": {
+            "type": "match_only_text"
+          }
+        }
+      },
+      {
+        "strings_as_keyword": {
+          "match_mapping_type": "string",
+          "mapping": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          }
+        }
+      }
+    ],
     "date_detection": false,
     "properties": {
       "@timestamp": {
         "type": "date"
       },
       "agent": {
-        "type": "object",
         "properties": {
           "ephemeral_id": {
             "type": "keyword",
@@ -73,11 +56,11 @@
           },
           "name": {
             "type": "keyword",
-            "ignore_above": 1024
+            "time_series_dimension": true
           },
           "type": {
             "type": "keyword",
-            "ignore_above": 1024
+            "time_series_dimension": true
           },
           "version": {
             "type": "keyword",
@@ -86,10 +69,8 @@
         }
       },
       "aws": {
-        "type": "object",
         "properties": {
           "cloudwatch": {
-            "type": "object",
             "properties": {
               "ingestion_time": {
                 "type": "keyword",
@@ -97,55 +78,25 @@
               },
               "log_group": {
                 "type": "keyword",
-                "ignore_above": 1024
+                "time_series_dimension": true
               },
               "log_stream": {
                 "type": "keyword",
-                "ignore_above": 1024
+                "time_series_dimension": true
               }
             }
           }
         }
       },
       "cloud": {
-        "type": "object",
         "properties": {
           "region": {
             "type": "keyword",
-            "ignore_above": 1024
-          }
-        }
-      },
-      "data_stream": {
-        "properties": {
-          "dataset": {
-	    {% if constant_keyword_available is defined  %}
-	      "type": "constant_keyword",
-	      "value": "benchmarks"
-	    {% else %}
-	      "type": "keyword"
-	    {% endif %}
-          },
-          "namespace": {
-	    {% if constant_keyword_available is defined  %}
-	      "type": "constant_keyword",
-	      "value": "day1"
-	    {% else %}
-	      "type": "keyword"
-	    {% endif %}
-          },
-          "type": {
-	    {% if constant_keyword_available is defined  %}
-	      "type": "constant_keyword",
-	      "value": "logs"
-	    {% else %}
-	      "type": "keyword"
-	    {% endif %}
+            "time_series_dimension": true
           }
         }
       },
       "ecs": {
-        "type": "object",
         "properties": {
           "version": {
             "type": "keyword",
@@ -154,7 +105,6 @@
         }
       },
       "event": {
-        "type": "object",
         "properties": {
           "dataset": {
             "type": "keyword",
@@ -162,7 +112,7 @@
           },
           "id": {
             "type": "keyword",
-            "ignore_above": 1024
+            "time_series_dimension": true
           },
           "ingested": {
             "type": "date"
@@ -173,19 +123,16 @@
         "type": "object"
       },
       "input": {
-        "type": "object",
         "properties": {
           "type": {
             "type": "keyword",
-            "ignore_above": 1024
+            "time_series_dimension": true
           }
         }
       },
       "log": {
-        "type": "object",
         "properties": {
           "file": {
-            "type": "object",
             "properties": {
               "path": {
                 "type": "keyword",
@@ -196,34 +143,33 @@
         }
       },
       "message": {
-        "type": "{{ match_only_text }}"
+        "type": "match_only_text"
       },
       "meta": {
-        "type": "object",
         "properties": {
           "file": {
             "type": "keyword",
-            "ignore_above": 1024
+            "time_series_dimension": true
           }
         }
       },
       "metrics": {
-        "type": "object",
         "properties": {
           "size": {
-            "type": "long"
+            "type": "long",
+            "time_series_metric": "gauge"
           },
           "tmin": {
-            "type": "long"
+            "type": "long",
+            "time_series_metric": "gauge"
           }
         }
       },
       "process": {
-        "type": "object",
         "properties": {
           "name": {
             "type": "keyword",
-            "ignore_above": 1024
+            "time_series_dimension": true
           }
         }
       },
