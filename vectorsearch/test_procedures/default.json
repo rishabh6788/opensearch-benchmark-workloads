@@ -17,6 +17,15 @@
     ]
 },
 {
+    "name": "no-train-test-index-with-merge",
+    "description": "Perform only indexing operation for vector search",
+    "default": false,
+    "schedule": [
+       {{ benchmark.collect(parts="common/index-only-schedule.json") }},
+       {{ benchmark.collect(parts="common/force-merge-schedule.json") }}
+    ]
+},
+{
     "name": "search-only",
     "default": false,
     "description": "Perform only vector search on previously indexed cluster.",
@@ -30,6 +39,15 @@
     "description": "Force merge vector search index to improve search performance",
     "schedule": [
        {{ benchmark.collect(parts="common/force-merge-schedule.json") }}
+    ]
+},
+{
+    "name": "no-train-test-aoss",
+    "description": "Index vector search which does not use an algorithm that requires training.",
+    "default": false,
+    "schedule": [
+       {{ benchmark.collect(parts="aoss/index-only-schedule.json") }},
+       {{ benchmark.collect(parts="aoss/search-only-schedule.json") }}
     ]
 },
 {
