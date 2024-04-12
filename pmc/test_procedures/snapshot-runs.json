@@ -10,13 +10,13 @@
       "name": "register-snapshot-repository",
       "operation": {
         "operation-type": "create-snapshot-repository",
-        "repository": "{{ snapshot_repo_name | default('test-snapshot-repo') | tojson }}",
+        "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
         "body": {
           "type": "s3",
           "settings": {
-            "bucket": "{{ snapshot_bucket_name | default('test-snapshot-bucket') | tojson }}",
-            "region": "{{ snapshot_region | default('us-east-1') | tojson }}",
-            "base_path": "{{ snapshot_base_path | default('test-base-path') | tojson }}"
+            "bucket": {{ snapshot_bucket_name | default('test-snapshot-bucket') | tojson }},
+            "region": {{ snapshot_region | default('us-east-1') | tojson }},
+            "base_path": {{ snapshot_base_path | default('test-base-path') | tojson }}
           }
         }
       }
@@ -25,8 +25,8 @@
       "name": "restore-from-snapshot",
       "operation": {
         "operation-type": "restore-snapshot",
-        "repository": "{{ snapshot_repo_name | default('test-snapshot-repo') | tojson }}",
-        "snapshot": "{{ snapshot_name | default('test-snapshot') | tojson }}",
+        "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
+        "snapshot": {{ snapshot_name | default('test-snapshot') | tojson }},
         "body": {
           "index_settings": {
             "index.number_of_replicas": {{ number_of_replicas | default(0) }}
@@ -62,7 +62,7 @@
         "operation-type": "cluster-health",
         "index": "pmc",
         "request-params": {
-          "wait_for_status": "{{cluster_health | default('green')}}",
+          "wait_for_status": {{ cluster_health | default('green') }},
           "wait_for_no_relocating_shards": "true"
         },
         "retry-until-success": true
