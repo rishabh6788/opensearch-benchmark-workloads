@@ -1,0 +1,114 @@
+{
+  "name": "restore-from-snapshot",
+  "description": "Restore data from a snapshot and run queries",
+  "default": false,
+  "schedule": [
+    {
+      "operation": "delete-index"
+    },
+    {
+      "name": "register-snapshot-repository",
+      "operation": {
+        "operation-type": "create-snapshot-repository",
+        "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
+    "body": {
+      "type": "s3",
+      "settings": {
+        "bucket": {{ snapshot_bucket_name | default('test-snapshot-bucket') | tojson }},
+    "region": {{ snapshot_region | default('us-east-1') | tojson }},
+    "base_path": {{ snapshot_base_path | default('test-base-path') | tojson }}
+  }
+  }
+  }
+  },
+    {
+      "name": "restore-from-snapshot",
+      "operation": {
+        "operation-type": "restore-snapshot",
+        "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
+    "snapshot": {{ snapshot_name | default('test-snapshot') | tojson }},
+    "body": {
+      "index_settings": {
+        "index.number_of_replicas": {{ number_of_replicas | default(0) }}
+  }
+  },
+    "wait-for-completion": false
+    }
+  },
+    {
+      "name": "wait-for-snapshot-recovery",
+      "operation": {
+        "operation-type": "wait-for-recovery",
+        "index": "pmc"
+      }
+    },
+    {
+      "name": "refresh-after-index",
+      "operation": "refresh",
+      "clients": 1
+    },
+    {
+      "operation": "force-merge",
+      "clients": 1
+    },
+    {
+      "name": "refresh-after-force-merge",
+      "operation": "refresh",
+      "clients": 1
+    },
+    {
+      "name": "check-cluster-health",
+      "operation": {
+        "operation-type": "cluster-health",
+        "index": "pmc",
+        "request-params": {
+          "wait_for_status": "{{cluster_health | default('green')}}",
+          "wait_for_no_relocating_shards": "true"
+        },
+        "retry-until-success": true
+      }
+    },
+    {
+      "operation": "default",
+      "warmup-iterations": 500,
+      "iterations": 200,
+      "target-throughput": {{ target_throughput | default(20) | tojson }},
+    "clients": {{ search_clients | default(1) }}
+  },
+    {
+      "operation": "term",
+      "warmup-iterations": 500,
+      "iterations": 200,
+      "target-throughput": {{ target_throughput | default(20) | tojson }},
+    "clients": {{ search_clients | default(1) }}
+  },
+    {
+      "operation": "phrase",
+      "warmup-iterations": 500,
+      "iterations": 200,
+      "target-throughput": {{ target_throughput | default(20) | tojson }},
+    "clients": {{ search_clients | default(1) }}
+  },
+    {
+      "operation": "articles_monthly_agg_uncached",
+      "warmup-iterations": 500,
+      "iterations": 200,
+      "target-throughput": {{ target_throughput | default(20) | tojson }},
+    "clients": {{ search_clients | default(1) }}
+  },
+    {
+      "operation": "articles_monthly_agg_cached",
+      "warmup-iterations": 500,
+      "iterations": 200,
+      "target-throughput": {{ target_throughput | default(20) | tojson }},
+    "clients": {{ search_clients | default(1) }}
+  },
+    {
+      "operation": "scroll",
+      "warmup-iterations": 50,
+      "iterations": 100,
+      "target-throughput": {{ target_throughput | default(0.5) | tojson }},
+    "clients": {{ search_clients | default(1) }}
+  }
+  ]
+}
