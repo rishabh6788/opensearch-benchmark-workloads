@@ -11,4 +11,11 @@
   "schedule": [
     {{ benchmark.collect(parts="common/test-schedule.json") }}
   ]
+},
+{
+  "name": "restore-from-snapshot",
+  "default": false,
+  "schedule": [
+    {{ benchmark.collect(parts="common/snapshot-run.json") }}
+  ]
 }

@@ -45,13 +45,12 @@ This workload allows the following parameters to be specified using `--workload-
 * `bulk_indexing_clients` (default: 8): Number of clients that issue bulk indexing requests.
 * `bulk_size` (default: 5000): The number of documents in each bulk during indexing.
 * `cluster_health` (default: "green"): The minimum required cluster health.
-* `corpus_size` (default: "100"): The size of the data corpus to use in GiB.  The currently provided sizes are 100, 1000 and 60.  Note that there are [certain considerations when using the 1000 GiB (1 TiB) data corpus](#considerations-when-using-the-1-tb-data-corpus).
 * `document_compressed_size_in_bytes`: If specifying an alternate data corpus, the compressed size of the corpus.
 * `document_count`: If specifying an alternate data corpus, the number of documents in that corpus.
 * `document_file`: If specifying an alternate data corpus, the file name of the corpus.
 * `document_uncompressed_size_in_bytes`: If specifying an alternate data corpus, the uncompressed size of the corpus.
 * `document_url`:  If specifying an alternate data corpus, the full path to the corpus file (optional).
-* `distribution_version` (default 2.11.0):  Used to specify the target cluster's version so as to select the appropriate mappings for that version.  This is distinct from the command line option and should be in the 3-part dotted semantic version format.
+* `distribution_version` (default 2.11):  Used to specify the target cluster's version so as to select the appropriate mappings for that version.  This is distinct from the command line option.
 * `error_level` (default: "non-fatal"): Available for bulk operations only to specify ignore-response-error-level.
 * `index_body` (default: "index.json"): The name of the file containing the index settings and mappings.
 * `index_name` (default: "big5"): The name of the index the workload should create and use for its operations.
@@ -65,7 +64,7 @@ This workload allows the following parameters to be specified using `--workload-
 * `requests_cache_enabled` (default: false): Whether the requests cache should be enabled.
 * `search_clients`: (default: 1): Number of clients that issue search requests.
 * `test_iterations` (default: 200): Number of test iterations per query that will have their latency and throughput measured.
-* `target_throughput` (default: 2): Target throughput for each query operation in requests per second, use 0 or "" for no throughput throttling.
+* `target_throughput` (default: 2): Target throughput for each query operation in requests per second, use "" for no limit.
 * `warmup_iterations` (default: 100): Number of warmup query iterations prior to actual measurements commencing.
 
 
@@ -179,27 +178,6 @@ Running range-auto-date-histo-with-metrics                                     [
 
 ------------------------------------------------------
 ```
-
-### Considerations when Using the 1 TB Data Corpus
-
-*Caveat*: This corpus is being made available as a feature that is currently in beta test.  Some points to note when carrying out performance runs using this corpus:
-
-  * Due to CloudFront download size limits, the uncompressed size of the 1 TB corpus is actually 0.95 TB (~0.9 TiB).  This [issue has been noted](https://github.com/opensearch-project/opensearch-benchmark/issues/543) and will be resolved in due course.
-  * Use an external data store to record metrics.  Using the in-memory store will likely result in the system running out of memory and becoming unresponsive, resulting in inaccurate performance numbers.
-  * Use a load generation host with sufficient disk space to hold the corpus.
-  * Ensure the target cluster has adequate storage and at least 3 data nodes.
-  * Specify an appropriate shard count and number of replicas so that shards are evenly distributed and appropriately sized.
-  * Running the workload requires an instance type with at least 8 cores and 32 GB memory.
-  * Install the `pbzip2` decompressor to speed up decompression of the corpus.
-  * Set the client timeout to a sufficiently large value, since some queries take a long time to complete.
-  * Allow sufficient time for the workload to run.  _Approximate_ times for the various steps involved, using an 8-core loadgen host:
-    - 15 minutes to download the corpus
-    - 4 hours to decompress the corpus (assuming `pbzip2` is available) and pre-process it
-    - 4 hours to index the data
-    - 30 minutes for the force-merge
-    - 8 hours to run the set of included queries
-
-More details will be added in due course.
 
 ### License
 
