@@ -1,0 +1,19 @@
+{
+  "aggs": {
+    "important_terms": {
+      "multi_terms": {
+        "terms": [
+          {
+            "field": "process.name"
+          },
+          {
+            "field": "event.id"
+          },
+          {
+            "field": "cloud.region"
+          }
+        ]
+      }
+    }
+  }
+}
