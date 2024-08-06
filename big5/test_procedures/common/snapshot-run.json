@@ -129,15 +129,6 @@
     "clients": {{ search_clients | default(1) }}
   },
 {%- endif %}
-{% if distribution_version.split('.') | map('int') | list  >= "2.11.0".split('.') | map('int') | list and distribution_version.split('.') | map('int') | list  < "6.0.0".split('.') | map('int') | list %}
-  {
-    "operation": "multi_terms-no-filter",
-    "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
-    "iterations": {{ test_iterations | default(50) | tojson }},
-    "target-throughput": {{ target_throughput | default(2) | tojson }},
-    "clients": {{ search_clients | default(1) }}
-  },
-{%- endif %}
 {
   "operation": "keyword-terms",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
