@@ -47,6 +47,15 @@
             }
           }
           {%- endif %}
+        },
+        "color": {
+          "type": "text"
+        },
+        "taste": {
+          "type": "text"
+        },
+        "age": {
+          "type": "integer"
         }
       }
     }

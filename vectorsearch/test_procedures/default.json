@@ -51,10 +51,21 @@
     ]
 },
 {
+    "name": "train-test",
+    "description": "Index vector search that requires training.",
+    "default": false,
+    "schedule": [
+        {{ benchmark.collect(parts="common/train-index-only-schedule.json") }},
+        {{ benchmark.collect(parts="common/train-model-schedule.json") }},
+        {{ benchmark.collect(parts="common/force-merge-schedule.json") }},
+        {{ benchmark.collect(parts="common/search-only-schedule.json") }}
+    ]
+},
+{
     "name": "restore-from-snapshot",
     "default": false,
     "description": "Restore data from snapshot and perform only vector search",
     "schedule": [
-       {{ benchmark.collect(parts="common/snapshot-run.json") }}
+        {{ benchmark.collect(parts="common/snapshot-run.json") }}
     ]
 }
