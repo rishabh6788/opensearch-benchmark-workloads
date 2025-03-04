@@ -1,0 +1,231 @@
+ {
+      "name": "restore-from-snapshot",
+      "description": "Restore data from a snapshot and run queries",
+      "default": false,
+      "schedule": [
+        {
+          "operation": "delete-index"
+        },
+        {
+          "name": "register-snapshot-repository",
+          "operation": {
+            "operation-type": "create-snapshot-repository",
+            "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
+        "body": {
+          "type": "s3",
+          "settings": {
+            "bucket": {{ snapshot_bucket_name | default('test-snapshot-bucket') | tojson }},
+        "region": {{ snapshot_region | default('us-east-1') | tojson }},
+        "base_path": {{ snapshot_base_path | default('test-base-path') | tojson }}
+      }
+      }
+      }
+      },
+        {
+          "name": "restore-from-snapshot",
+          "operation": {
+            "operation-type": "restore-snapshot",
+            "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
+        "snapshot": {{ snapshot_name | default('test-snapshot') | tojson }},
+        "body": {
+          "index_settings": {
+            "index.number_of_replicas": {{ number_of_replicas | default(0) }}
+      }
+      },
+        "wait-for-completion": false
+        }
+      },
+        {
+          "name": "wait-for-snapshot-recovery",
+          "operation": {
+            "operation-type": "wait-for-recovery",
+            "index": "weather-data-2016"
+          }
+        },
+        {
+          "name": "refresh-after-index",
+          "operation": "refresh",
+          "clients": 1
+        },
+        {
+          "name": "check-cluster-health",
+          "operation": {
+            "operation-type": "cluster-health",
+            "index": "weather-data-2016",
+            "request-params": {
+              "wait_for_status": "{{cluster_health | default('green')}}",
+              "wait_for_no_relocating_shards": "true"
+            },
+            "retry-until-success": true
+          }
+        },
+        {
+          "operation": "keyword-terms",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 2
+        },
+        {
+          "operation": "keyword-terms-low-cardinality",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 0.1
+        },
+        {
+          "operation": "keyword-terms-min",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 3
+        },
+        {
+          "operation": "keyword-terms-low-cardinality-min",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 3
+        },
+        {
+          "operation": "keyword-terms-numeric-terms",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 5
+        },
+        {
+          "operation": "numeric-terms-numeric-terms",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 3
+        },
+        {
+          "operation": "date-histo-entire-range",
+          "clients": 1,
+          "warmup-iterations": 100,
+          "iterations": 500,
+          "target-interval": 0.2
+        },
+        {
+          "operation": "date-histo-numeric-terms",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 3
+        },
+        {
+          "operation": "date-histo-string-terms-via-map",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 17
+        },
+        {
+          "operation": "date-histo-string-terms-via-global-ords",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 6
+        },
+        {
+          "operation": "date-histo-string-terms-via-default-strategy",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 6
+        },
+        {
+          "operation": "date-histo-string-significant-terms-via-map",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 30
+        },
+        {
+          "operation": "date-histo-string-significant-terms-via-global-ords",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 15
+        },
+        {
+          "operation": "date-histo-string-significant-terms-via-default-strategy",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 15
+        },
+        {
+          "operation": "date-histo-histo",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 3
+        },
+        {
+          "operation": "date-histo-geohash-grid",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 4
+        },
+        {
+          "operation": "date-histo-geotile-grid",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 4
+        },
+        {
+          "operation": "range-aggregation",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 3
+        },
+        {
+          "operation": "range-numeric-significant-terms",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 16
+        },
+        {
+          "operation": "range-date-histo",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 3
+        },
+        {
+          "operation": "range-date-histo-with-metrics",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 6
+        },
+        {
+          "operation": "range-auto-date-histo",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 3
+        },
+        {
+          "operation": "range-auto-date-histo-with-metrics",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 6
+        },
+        {
+          "operation": "range-auto-date-histo-with-time-zone",
+          "clients": 1,
+          "warmup-iterations": 10,
+          "iterations": 50,
+          "target-interval": 7
+        }
+      ]
+    }

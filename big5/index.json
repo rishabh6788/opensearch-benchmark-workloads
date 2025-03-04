@@ -20,7 +20,7 @@
     {% endif %}
     "index.codec": "best_compression",
     "index.translog.sync_interval": "30s",
-    "index.translog.durability": {{index_translog_durability | default("async") | tojson}},
+    "index.translog.durability": "async",
     "index.query.default_field": [
       "message"
     ]

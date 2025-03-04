@@ -28,6 +28,7 @@
     {
       "name": "default",
       "operation-type": "search",
+      "index": "nyc_taxis*",
       "body": {
         "query": {
           "match_all": {}
@@ -37,6 +38,7 @@
     {
       "name": "range",
       "operation-type": "search",
+      "index": "nyc_taxis*",
       "body": {
         "query": {
           "range": {
@@ -51,6 +53,7 @@
     {
       "name": "distance_amount_agg",
       "operation-type": "search",
+      "index": "nyc_taxis*",
       "body": {
         "size": 0,
         "query": {
@@ -85,6 +88,7 @@
     {
       "name": "autohisto_agg",
       "operation-type": "search",
+      "index": "nyc_taxis*",
       "body": {
         "size": 0,
         "query": {
@@ -109,6 +113,7 @@
     {
       "name": "date_histogram_agg",
       "operation-type": "search",
+      "index": "nyc_taxis*",
       "body": {
         "size": 0,
         "query": {
@@ -133,6 +138,7 @@
     {
       "name": "date_histogram_calendar_interval",
       "operation-type": "search",
+      "index": "nyc_taxis*",
       "body": {
         "size": 0,
         "query": {
@@ -156,6 +162,7 @@
     {
       "name": "date_histogram_calendar_interval_with_tz",
       "operation-type": "search",
+      "index": "nyc_taxis*",
       "body": {
         "size": 0,
         "query": {
@@ -180,6 +187,7 @@
     {
       "name": "date_histogram_fixed_interval",
       "operation-type": "search",
+      "index": "nyc_taxis*",
       "body": {
         "size": 0,
         "query": {
@@ -203,6 +211,7 @@
     {
       "name": "date_histogram_fixed_interval_with_tz",
       "operation-type": "search",
+      "index": "nyc_taxis*",
       "body": {
         "size": 0,
         "query": {
@@ -227,6 +236,7 @@
     {
       "name": "date_histogram_fixed_interval_with_metrics",
       "operation-type": "search",
+      "index": "nyc_taxis*",
       "body": {
         "size": 0,
         "query": {
@@ -255,6 +265,7 @@
     {
       "name": "auto_date_histogram",
       "operation-type": "search",
+      "index": "nyc_taxis*",
       "body": {
         "size": 0,
         "query": {
@@ -278,6 +289,7 @@
     {
       "name": "auto_date_histogram_with_tz",
       "operation-type": "search",
+      "index": "nyc_taxis*",
       "body": {
         "size": 0,
         "query": {
@@ -302,6 +314,7 @@
     {
       "name": "auto_date_histogram_with_metrics",
       "operation-type": "search",
+      "index": "nyc_taxis*",
       "body": {
         "size": 0,
         "query": {
@@ -330,7 +343,7 @@
     {
       "name": "desc_sort_tip_amount",
       "operation-type": "search",
-      "index": "nyc_taxis",
+      "index": "nyc_taxis*",
       "body": {
         "query": {
           "match_all": {}
@@ -343,7 +356,7 @@
     {
       "name": "asc_sort_tip_amount",
       "operation-type": "search",
-      "index": "nyc_taxis",
+      "index": "nyc_taxis*",
       "body": {
         "query": {
           "match_all": {}

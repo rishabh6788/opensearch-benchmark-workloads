@@ -839,7 +839,7 @@
                 },
                 "aggs": {
                   "max": {
-                    "max": { "field": "TMAX" }
+                    "max": { "field": "tmax" }
                   }
                 }
               }
