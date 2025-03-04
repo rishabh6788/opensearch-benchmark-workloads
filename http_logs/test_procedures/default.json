@@ -3,58 +3,157 @@
       "description": "Indexes the whole document corpus using OpenSearch default settings. We only adjust the number of replicas as we benchmark a single node cluster and Benchmark will only start the benchmark if the cluster turns green. Document ids are unique so all index operations are append only. After that a couple of queries are run.",
       "default": true,
       "schedule": [
-        {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }},
+        {
+          "operation": "delete-index"
+        },
+        {
+          "operation": {
+            "operation-type": "create-index",
+            "settings": {{index_settings | default({}) | tojson}}
+          }
+        },
+        {
+          "name": "check-cluster-health",
+          "operation": {
+            "operation-type": "cluster-health",
+            "index": "logs-*",
+            "request-params": {
+              "wait_for_status": "{{cluster_health | default('green')}}",
+              "wait_for_no_relocating_shards": "true"
+            },
+            "retry-until-success": true
+          }
+        },
+        {
+          "operation": "index-append",
+          "warmup-time-period": 240,
+          "clients": {{bulk_indexing_clients | default(8)}}
+        },
+        {
+          "name": "refresh-after-index",
+          "operation": "refresh"
+        },
+        {
+          "operation": {
+            "operation-type": "force-merge",
+            "request-timeout": 7200
+          }
+        },
+        {
+          "name": "refresh-after-force-merge",
+          "operation": "refresh"
+        },
+        {
+          "name": "wait-until-merges-finish",
+          "operation": {
+            "operation-type": "index-stats",
+            "index": "_all",
+            "condition": {
+              "path": "_all.total.merges.current",
+              "expected-value": 0
+            },
+            "retry-until-success": true,
+            "include-in-reporting": false
+          }
+        },
         {
           "operation": "default",
-          "warmup-iterations": {{ default_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ default_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ default_target_throughput or target_throughput | default(8) | tojson }},
-          "clients": {{ default_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 8
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "term",
           "operation": "term",
-          "warmup-iterations": {{ term_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ term_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ term_target_throughput or target_throughput | default(50) | tojson }},
-          "clients": {{ term_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 50
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "range",
-          "warmup-iterations": {{ range_warmup_iterations or warmup_iterations | default(100) | tojson }},
-          "iterations": {{ range_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ range_target_throughput or target_throughput | default(1) | tojson }},
-          "clients": {{ range_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 100,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 1
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
-          "name": "status-200s-in-range",
           "operation": "200s-in-range",
-          "warmup-iterations": {{ status_200s_in_range_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ status_200s_in_range_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ status_200s_in_range_target_throughput or target_throughput | default(33) | tojson }},
-          "clients": {{ status_200s_in_range_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 33
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
-          "name": "status-400s-in-range",
           "operation": "400s-in-range",
-          "warmup-iterations": {{ status_400s_in_range_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ status_400s_in_range_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ status_400s_in_range_target_throughput or target_throughput | default(50) | tojson }},
-          "clients": {{ status_400s_in_range_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 50
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "hourly_agg",
-          "warmup-iterations": {{ hourly_agg_warmup_iterations or warmup_iterations | default(50) | tojson }},
-          "iterations": {{ hourly_agg_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ hourly_agg_target_throughput or target_throughput | default(0.2) | tojson }},
-          "clients": {{ hourly_agg_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 50,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.2
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "multi_term_agg",
-          "warmup-iterations": {{ multi_term_agg_warmup_iterations or warmup_iterations | default(50) | tojson }},
-          "iterations": {{ multi_term_agg_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ multi_term_agg_target_throughput or target_throughput | default(0.2) | tojson }},
-          "clients": {{ multi_term_agg_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 50,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.2
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "scroll",
@@ -65,52 +164,95 @@
         },
         {
           "operation": "desc_sort_size",
-          "warmup-iterations": {{ desc_sort_size_warmup_iterations or warmup_iterations | default(200) | tojson }},
-          "iterations": {{ desc_sort_size_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ desc_sort_size_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ desc_sort_size_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 200,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "asc_sort_size",
-          "warmup-iterations": {{ asc_sort_size_warmup_iterations or warmup_iterations | default(200) | tojson }},
-          "iterations": {{ asc_sort_size_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ asc_sort_size_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ asc_sort_size_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 200,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "desc_sort_timestamp",
-          "warmup-iterations": {{ desc_sort_timestamp_warmup_iterations or warmup_iterations | default(200) | tojson }},
-          "iterations": {{ desc_sort_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ desc_sort_timestamp_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ desc_sort_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 200,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "asc_sort_timestamp",
-          "warmup-iterations": {{ asc_sort_timestamp_warmup_iterations or warmup_iterations | default(200) | tojson }},
-          "iterations": {{ asc_sort_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ asc_sort_timestamp_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ asc_sort_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 200,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "desc_sort_with_after_timestamp",
-          "warmup-iterations": {{ desc_sort_with_after_timestamp_warmup_iterations or warmup_iterations | default(10) | tojson }},
-          "iterations": {{ desc_sort_with_after_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ desc_sort_with_after_timestamp_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ desc_sort_with_after_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 10,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "asc_sort_with_after_timestamp",
-          "warmup-iterations": {{ asc_sort_with_after_timestamp_warmup_iterations or warmup_iterations | default(10) | tojson }},
-          "iterations": {{ asc_sort_with_after_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ asc_sort_with_after_timestamp_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ asc_sort_with_after_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 10,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "force-merge-1-seg",
           "operation": {
             "operation-type": "force-merge",
             "max-num-segments": 1,
-            "request-timeout": 7200
+            "mode": "polling",
+            "request-timeout": 900
           }
         },
         {
@@ -133,34 +275,62 @@
         {
           "name": "desc-sort-timestamp-after-force-merge-1-seg",
           "operation": "desc_sort_timestamp",
-          "warmup-iterations": {{ desc_sort_timestamp_warmup_iterations or warmup_iterations | default(200) | tojson }},
-          "iterations": {{ desc_sort_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ desc_sort_timestamp_target_throughput or target_throughput | default(2) | tojson }},
-          "clients": {{ desc_sort_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 200,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 2
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "asc-sort-timestamp-after-force-merge-1-seg",
           "operation": "asc_sort_timestamp",
-          "warmup-iterations": {{ asc_sort_timestamp_warmup_iterations or warmup_iterations | default(200) | tojson }},
-          "iterations": {{ asc_sort_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ asc_sort_timestamp_target_throughput or target_throughput | default(2) | tojson }},
-          "clients": {{ asc_sort_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 200,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 2
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "desc-sort-with-after-timestamp-after-force-merge-1-seg",
           "operation": "desc_sort_with_after_timestamp",
-          "warmup-iterations": {{ desc_sort_with_after_timestamp_warmup_iterations or warmup_iterations | default(10) | tojson }},
-          "iterations": {{ desc_sort_with_after_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ desc_sort_with_after_timestamp_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ desc_sort_with_after_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 10,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "asc-sort-with-after-timestamp-after-force-merge-1-seg",
           "operation": "asc_sort_with_after_timestamp",
-          "warmup-iterations": {{ asc_sort_with_after_timestamp_warmup_iterations or warmup_iterations | default(10) | tojson }},
-          "iterations": {{ asc_sort_with_after_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ asc_sort_with_after_timestamp_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ asc_sort_with_after_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 10,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         }
       ]
     },
@@ -168,51 +338,143 @@
       "name": "append-no-conflicts-original",
       "description": "Indexes the whole document corpus using OpenSearch default settings. We only adjust the number of replicas as we benchmark a single node cluster and Benchmark will only start the benchmark if the cluster turns green. Document ids are unique so all index operations are append only. After that a couple of queries are run.",
       "schedule": [
-        {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }},
+        {
+          "operation": "delete-index"
+        },
+        {
+          "operation": {
+            "operation-type": "create-index",
+            "settings": {{index_settings | default({}) | tojson}}
+          }
+        },
+        {
+          "name": "check-cluster-health",
+          "operation": {
+            "operation-type": "cluster-health",
+            "index": "logs-*",
+            "request-params": {
+              "wait_for_status": "{{cluster_health | default('green')}}",
+              "wait_for_no_relocating_shards": "true"
+            },
+            "retry-until-success": true
+          }
+        },
+        {
+          "operation": "index-append",
+          "warmup-time-period": 240,
+          "clients": {{bulk_indexing_clients | default(8)}}
+        },
+        {
+          "name": "refresh-after-index",
+          "operation": "refresh"
+        },
+        {
+          "operation": {
+            "operation-type": "force-merge",
+            "request-timeout": 7200
+          }
+        },
+        {
+          "name": "refresh-after-force-merge",
+          "operation": "refresh"
+        },
+        {
+          "name": "wait-until-merges-finish",
+          "operation": {
+            "operation-type": "index-stats",
+            "index": "_all",
+            "condition": {
+              "path": "_all.total.merges.current",
+              "expected-value": 0
+            },
+            "retry-until-success": true,
+            "include-in-reporting": false
+          }
+        },
         {
           "operation": "default",
-          "warmup-iterations": {{ default_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ default_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ default_target_throughput or target_throughput | default(8) | tojson }},
-          "clients": {{ default_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 8
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "term",
           "operation": "term",
-          "warmup-iterations": {{ term_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ term_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ term_target_throughput or target_throughput | default(50) | tojson }},
-          "clients": {{ term_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 50
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "range",
-          "warmup-iterations": {{ range_warmup_iterations or warmup_iterations | default(100) | tojson }},
-          "iterations": {{ range_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ range_target_throughput or target_throughput | default(1) | tojson }},
-          "clients": {{ range_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 100,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 1
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
-          "name": "status-200s-in-range",
           "operation": "200s-in-range",
-          "warmup-iterations": {{ status_200s_in_range_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ status_200s_in_range_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ status_200s_in_range_target_throughput or target_throughput | default(33) | tojson }},
-          "clients": {{ status_200s_in_range_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 33
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
-          "name": "status-400s-in-range",
           "operation": "400s-in-range",
-          "warmup-iterations": {{ status_400s_in_range_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ status_400s_in_range_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ status_400s_in_range_target_throughput or target_throughput | default(50) | tojson }},
-          "clients": {{ status_400s_in_range_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 50
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "hourly_agg",
-          "warmup-iterations": {{ hourly_agg_warmup_iterations or warmup_iterations | default(50) | tojson }},
-          "iterations": {{ hourly_agg_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ hourly_agg_target_throughput or target_throughput | default(0.2) | tojson }},
-          "clients": {{ hourly_agg_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 50,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.2
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "scroll",
@@ -223,45 +485,87 @@
         },
         {
           "operation": "desc_sort_size",
-          "warmup-iterations": {{ desc_sort_size_warmup_iterations or warmup_iterations | default(200) | tojson }},
-          "iterations": {{ desc_sort_size_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ desc_sort_size_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ desc_sort_size_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 200,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "asc_sort_size",
-          "warmup-iterations": {{ asc_sort_size_warmup_iterations or warmup_iterations | default(200) | tojson }},
-          "iterations": {{ asc_sort_size_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ asc_sort_size_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ asc_sort_size_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 200,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "desc_sort_timestamp",
-          "warmup-iterations": {{ desc_sort_timestamp_warmup_iterations or warmup_iterations | default(200) | tojson }},
-          "iterations": {{ desc_sort_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ desc_sort_timestamp_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ desc_sort_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 200,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "asc_sort_timestamp",
-          "warmup-iterations": {{ asc_sort_timestamp_warmup_iterations or warmup_iterations | default(200) | tojson }},
-          "iterations": {{ asc_sort_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ asc_sort_timestamp_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ asc_sort_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 200,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "desc_sort_with_after_timestamp",
-          "warmup-iterations": {{ desc_sort_with_after_timestamp_warmup_iterations or warmup_iterations | default(10) | tojson }},
-          "iterations": {{ desc_sort_with_after_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ desc_sort_with_after_timestamp_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ desc_sort_with_after_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 10,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "asc_sort_with_after_timestamp",
-          "warmup-iterations": {{ asc_sort_with_after_timestamp_warmup_iterations or warmup_iterations | default(10) | tojson }},
-          "iterations": {{ asc_sort_with_after_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ asc_sort_with_after_timestamp_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ asc_sort_with_after_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 10,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "force-merge-1-seg",
@@ -291,34 +595,62 @@
         {
           "name": "desc-sort-timestamp-after-force-merge-1-seg",
           "operation": "desc_sort_timestamp",
-          "warmup-iterations": {{ desc_sort_timestamp_warmup_iterations or warmup_iterations | default(200) | tojson }},
-          "iterations": {{ desc_sort_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ desc_sort_timestamp_target_throughput or target_throughput | default(2) | tojson }},
-          "clients": {{ desc_sort_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 200,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 2
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "asc-sort-timestamp-after-force-merge-1-seg",
           "operation": "asc_sort_timestamp",
-          "warmup-iterations": {{ asc_sort_timestamp_warmup_iterations or warmup_iterations | default(200) | tojson }},
-          "iterations": {{ asc_sort_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ asc_sort_timestamp_target_throughput or target_throughput | default(2) | tojson }},
-          "clients": {{ asc_sort_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 200,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 2
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "desc-sort-with-after-timestamp-after-force-merge-1-seg",
           "operation": "desc_sort_with_after_timestamp",
-          "warmup-iterations": {{ desc_sort_with_after_timestamp_warmup_iterations or warmup_iterations | default(10) | tojson }},
-          "iterations": {{ desc_sort_with_after_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ desc_sort_with_after_timestamp_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ desc_sort_with_after_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 10,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "asc-sort-with-after-timestamp-after-force-merge-1-seg",
           "operation": "asc_sort_with_after_timestamp",
-          "warmup-iterations": {{ asc_sort_with_after_timestamp_warmup_iterations or warmup_iterations | default(10) | tojson }},
-          "iterations": {{ asc_sort_with_after_timestamp_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ asc_sort_with_after_timestamp_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ asc_sort_with_after_timestamp_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 10,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         }
       ]
     },
@@ -326,28 +658,150 @@
       "name": "append-no-conflicts-index-only",
       "description": "Indexes the whole document corpus using OpenSearch default settings. We only adjust the number of replicas as we benchmark a single node cluster and Benchmark will only start the benchmark if the cluster turns green. Document ids are unique so all index operations are append only.",
       "schedule": [
-        {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }}
+        {
+          "operation": "delete-index"
+        },
+        {
+          "operation": {
+            "operation-type": "create-index",
+            "settings": {{index_settings | default({}) | tojson}}
+          }
+        },
+        {
+          "name": "check-cluster-health",
+          "operation": {
+            "operation-type": "cluster-health",
+            "index": "logs-*",
+            "request-params": {
+              "wait_for_status": "{{cluster_health | default('green')}}",
+              "wait_for_no_relocating_shards": "true"
+            },
+            "retry-until-success": true
+          }
+        },
+        {
+          "operation": "index-append",
+          "warmup-time-period": 240,
+          "clients": {{bulk_indexing_clients | default(8)}},
+          "ignore-response-error-level": "{{error_level | default('non-fatal')}}"
+        },
+        {
+          "name": "refresh-after-index",
+          "operation": "refresh"
+        },
+        {
+          "operation": {
+            "operation-type": "force-merge",
+            "request-timeout": 7200
+          }
+        },
+        {
+          "name": "refresh-after-force-merge",
+          "operation": "refresh"
+        },
+        {
+          "name": "wait-until-merges-finish",
+          "operation": {
+            "operation-type": "index-stats",
+            "index": "_all",
+            "condition": {
+              "path": "_all.total.merges.current",
+              "expected-value": 0
+            },
+            "retry-until-success": true,
+            "include-in-reporting": false
+          }
+        }
       ]
     },
     {
       "name": "append-sorted-no-conflicts",
       "description": "Indexes the whole document corpus in an index sorted by timestamp field in descending order (most recent first) and using a setup that will lead to a larger indexing throughput than the default settings. Document ids are unique so all index operations are append only.",
       "schedule": [
-        {% with default_index_settings={
+        {
+          "operation": "delete-index"
+        },
+        {
+          "operation": {
+            "operation-type": "create-index",
+            "settings": {%- if index_settings is defined %} {{index_settings | tojson}} {%- else %} {
               "index.sort.field": "@timestamp",
               "index.sort.order": "desc"
-        } %}
-        {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }}
-        {% endwith %}
+            }{%- endif %}
+          }
+        },
+        {
+          "name": "check-cluster-health",
+          "operation": {
+            "operation-type": "cluster-health",
+            "index": "logs-*",
+            "request-params": {
+              "wait_for_status": "{{cluster_health | default('green')}}",
+              "wait_for_no_relocating_shards": "true"
+            },
+            "retry-until-success": true
+          }
+        },
+        {
+          "operation": "index-append",
+          "warmup-time-period": 240,
+          "clients": {{bulk_indexing_clients | default(8)}},
+          "ignore-response-error-level": "{{error_level | default('non-fatal')}}"
+        },
+        {
+          "name": "refresh-after-index",
+          "operation": "refresh"
+        },
+        {
+          "operation": {
+            "operation-type": "force-merge",
+            "request-timeout": 7200
+          }
+        },
+        {
+          "name": "refresh-after-force-merge",
+          "operation": "refresh"
+        },
+        {
+          "name": "wait-until-merges-finish",
+          "operation": {
+            "operation-type": "index-stats",
+            "index": "_all",
+            "condition": {
+              "path": "_all.total.merges.current",
+              "expected-value": 0
+            },
+            "retry-until-success": true,
+            "include-in-reporting": false
+          }
+        }
       ]
     },
     {
       "name": "append-index-only-with-ingest-pipeline",
       "description": "Indexes the whole document corpus using OpenSearch default settings. We only adjust the number of replicas as we benchmark a single node cluster and Benchmark will only start the benchmark if the cluster turns green. Document ids are unique so all index operations are append only. Runs the documents through an ingest node pipeline to parse the http logs. May require --opensearch-plugins='ingest-geoip' ",
       "schedule": [
-        {{ benchmark.collect(parts="../../common_operations/delete_index.json") }},
-        {{ benchmark.collect(parts="../../common_operations/create_index.json") }},
-        {{ benchmark.collect(parts="../../common_operations/check_cluster_health.json") }},
+        {
+          "operation": "delete-index"
+        },
+        {
+          "operation": {
+            "operation-type": "create-index",
+            "settings": {{index_settings | default({}) | tojson}}
+          }
+        },
+        {
+          "name": "check-cluster-health",
+          "operation": {
+            "operation-type": "cluster-health",
+            "index": "logs-*",
+            "request-params": {
+              "wait_for_status": "{{cluster_health | default('green')}}",
+              "wait_for_no_relocating_shards": "true"
+            },
+            "retry-until-success": true
+          }
+        },
         {
         "operation": "create-http-log-{{ingest_pipeline | default('baseline')}}-pipeline"
         },
@@ -361,21 +815,59 @@
           "name": "refresh-after-index",
           "operation": "refresh"
         },
-        {{ benchmark.collect(parts="../../common_operations/force_merge.json") }}
+        {
+          "operation": {
+            "operation-type": "force-merge",
+            "request-timeout": 7200
+          }
+        },
+        {
+          "name": "refresh-after-force-merge",
+          "operation": "refresh"
+        },
+        {
+          "name": "wait-until-merges-finish",
+          "operation": {
+            "operation-type": "index-stats",
+            "index": "_all",
+            "condition": {
+              "path": "_all.total.merges.current",
+              "expected-value": 0
+            },
+            "retry-until-success": true,
+            "include-in-reporting": false
+          }
+        }
       ]
     },
     {
       "name": "update",
       "schedule": [
-        {{ benchmark.collect(parts="../../common_operations/delete_index.json") }},
-        {% with default_index_settings={
-          "index.number_of_shards": number_of_shards | default(1),
-          "index.number_of_replicas": number_of_replicas | default(0),
-          "index.store.type": store_type | default('fs')
-        } %}
-        {{ benchmark.collect(parts="../../common_operations/create_index.json") }},
-        {% endwith %}
-        {{ benchmark.collect(parts="../../common_operations/check_cluster_health.json") }},
+        {
+          "operation": "delete-index"
+        },
+        {
+          "operation": {
+            "operation-type": "create-index",
+            "settings": {%- if index_settings is defined %} {{index_settings | tojson}} {%- else %} {
+              "index.number_of_shards": {{number_of_shards | default(1)}},
+              "index.number_of_replicas": {{number_of_replicas | default(0)}},
+              "index.store.type": "{{store_type | default('fs')}}"
+            }{%- endif %}
+          }
+        },
+        {
+          "name": "check-cluster-health",
+          "operation": {
+            "operation-type": "cluster-health",
+            "index": "logs-*",
+            "request-params": {
+              "wait_for_status": "{{cluster_health | default('green')}}",
+              "wait_for_no_relocating_shards": "true"
+            },
+            "retry-until-success": true
+          }
+        },
         {
           "operation": "update",
           "warmup-time-period": 240,
@@ -386,14 +878,89 @@
           "name": "refresh-after-index",
           "operation": "refresh"
         },
-        {{ benchmark.collect(parts="../../common_operations/force_merge.json") }}
+        {
+          "operation": {
+            "operation-type": "force-merge",
+            "request-timeout": 7200
+          }
+        },
+        {
+          "name": "refresh-after-force-merge",
+          "operation": "refresh"
+        },
+        {
+          "name": "wait-until-merges-finish",
+          "operation": {
+            "operation-type": "index-stats",
+            "index": "_all",
+            "condition": {
+              "path": "_all.total.merges.current",
+              "expected-value": 0
+            },
+            "retry-until-success": true,
+            "include-in-reporting": false
+          }
+        }
       ]
     },
     {
       "name": "append-no-conflicts-index-reindex-only",
       "description": "Indexes the whole document corpus using OpenSearch default settings. We only adjust the number of replicas as we benchmark a single node cluster and Benchmark will only start the benchmark if the cluster turns green. Document ids are unique so all index operations are append only. After indexing, same data are reindexed.",
       "schedule": [
-        {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }},
+        {
+          "operation": "delete-index"
+        },
+        {
+          "operation": {
+            "operation-type": "create-index",
+            "settings": {{index_settings | default({}) | tojson}}
+          }
+        },
+        {
+          "name": "check-cluster-health",
+          "operation": {
+            "operation-type": "cluster-health",
+            "index": "logs-*",
+            "request-params": {
+              "wait_for_status": "{{cluster_health | default('green')}}",
+              "wait_for_no_relocating_shards": "true"
+            },
+            "retry-until-success": true
+          }
+        },
+        {
+          "operation": "index-append",
+          "warmup-time-period": 240,
+          "clients": {{bulk_indexing_clients | default(8)}},
+          "ignore-response-error-level": "{{error_level | default('non-fatal')}}"
+        },
+        {
+          "name": "refresh-after-index",
+          "operation": "refresh"
+        },
+        {
+          "operation": {
+            "operation-type": "force-merge",
+            "request-timeout": 7200
+          }
+        },
+        {
+          "name": "refresh-after-force-merge",
+          "operation": "refresh"
+        },
+        {
+          "name": "wait-until-merges-finish",
+          "operation": {
+            "operation-type": "index-stats",
+            "index": "_all",
+            "condition": {
+              "path": "_all.total.merges.current",
+              "expected-value": 0
+            },
+            "retry-until-success": true,
+            "include-in-reporting": false
+          }
+        },
         {
           "name": "reindex",
           "operation": {
@@ -415,9 +982,27 @@
       "name": "search-pipeline",
       "description": "Indexes the whole document corpus using OpenSearch default settings. We only adjust the number of replicas as we benchmark a single node cluster and Benchmark will only start the benchmark if the cluster turns green. Runs the search request through an search pipeline with predefined search processors.",
       "schedule": [
-        {{ benchmark.collect(parts="../../common_operations/delete_index.json") }},
-        {{ benchmark.collect(parts="../../common_operations/create_index.json") }},
-        {{ benchmark.collect(parts="../../common_operations/check_cluster_health.json") }},
+        {
+          "operation": "delete-index"
+        },
+        {
+          "operation": {
+            "operation-type": "create-index",
+            "settings": {{index_settings | default({}) | tojson}}
+          }
+        },
+        {
+          "name": "check-cluster-health",
+          "operation": {
+            "operation-type": "cluster-health",
+            "index": "logs-*",
+            "request-params": {
+              "wait_for_status": "{{cluster_health | default('green')}}",
+              "wait_for_no_relocating_shards": "true"
+            },
+            "retry-until-success": true
+          }
+        },
         {
           "operation": "create-http-log-baseline-search-pipeline"
         },
@@ -448,14 +1033,43 @@
           "name": "refresh-after-index",
           "operation": "refresh"
         },
-        {{ benchmark.collect(parts="../../common_operations/force_merge.json") }},
+        {
+          "operation": {
+            "operation-type": "force-merge",
+            "request-timeout": 7200
+          }
+        },
+        {
+          "name": "refresh-after-force-merge",
+          "operation": "refresh"
+        },
+        {
+          "name": "wait-until-merges-finish",
+          "operation": {
+            "operation-type": "index-stats",
+            "index": "_all",
+            "condition": {
+              "path": "_all.total.merges.current",
+              "expected-value": 0
+            },
+            "retry-until-success": true,
+            "include-in-reporting": false
+          }
+        },
         {
           "name": "match-all",
           "operation": "default",
-          "warmup-iterations": {{ default_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ default_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ default_target_throughput or target_throughput | default(8) | tojson }},
-          "clients": {{ default_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 8
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "match-all-baseline-search-pipeline",
@@ -463,10 +1077,17 @@
           "request-params": {
             "search-pipeline": "http-log-baseline-search-pipeline"
           },
-          "warmup-iterations": {{ default_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ default_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ default_target_throughput or target_throughput | default(8) | tojson }},
-          "clients": {{ default_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 8
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "match-all-status-filter-search-pipeline",
@@ -474,10 +1095,17 @@
           "request-params": {
             "search-pipeline": "http-log-status-filter-search-pipeline"
           },
-          "warmup-iterations": {{ default_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ default_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ default_target_throughput or target_throughput | default(8) | tojson }},
-          "clients": {{ default_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 8
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "match-all-rename-field-search-pipeline",
@@ -485,10 +1113,17 @@
           "request-params": {
             "search-pipeline": "http-log-rename-field-search-pipeline"
           },
-          "warmup-iterations": {{ default_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ default_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ default_target_throughput or target_throughput | default(8) | tojson }},
-          "clients": {{ default_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 8
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "match-all-rename-100-field-search-pipeline",
@@ -496,10 +1131,17 @@
           "request-params": {
             "search-pipeline": "http-log-rename-100-field-search-pipeline"
           },
-          "warmup-iterations": {{ default_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ default_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ default_target_throughput or target_throughput | default(8) | tojson }},
-          "clients": {{ default_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 8
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "match-all-dummy-scripting-search-pipeline",
@@ -507,10 +1149,17 @@
           "request-params": {
             "search-pipeline": "http-log-dummy-scripting-search-pipeline"
           },
-          "warmup-iterations": {{ default_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ default_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ default_target_throughput or target_throughput | default(8) | tojson }},
-          "clients": {{ default_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 8
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "match-all-100-dummy-scripting-search-pipeline",
@@ -518,10 +1167,17 @@
           "request-params": {
             "search-pipeline": "http-log-100-dummy-scripting-search-pipeline"
           },
-          "warmup-iterations": {{ default_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ default_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ default_target_throughput or target_throughput | default(8) | tojson }},
-          "clients": {{ default_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 8
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "match-all-all-processors-search-pipeline",
@@ -529,37 +1185,65 @@
           "request-params": {
             "search-pipeline": "http-log-all-processors-search-pipeline"
           },
-          "warmup-iterations": {{ default_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ default_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ default_target_throughput or target_throughput | default(8) | tojson }},
-          "clients": {{ default_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 8
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "multi-term-filter",
           "operation": "multi-term-filter",
-          "warmup-iterations": {{ default_warmup_iterations or warmup_iterations | default(500) | tojson }},
-          "iterations": {{ default_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ multi_term_filter_target_throughput or target_throughput | default(50) | tojson }},
-          "clients": {{ multi_term_filter_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 500,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 50
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "term-status-filter-search-pipeline",
           "operation": "term",
-          "warmup-iterations": {{ default_warmup_iterations or warmup_iterations | default(500) | tojson }},
+          "warmup-iterations": 500,
           "request-params": {
             "search-pipeline": "http-log-status-filter-search-pipeline"
           },
-          "iterations": {{ default_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ term_target_throughput or target_throughput | default(50) | tojson }},
-          "clients": {{ term_search_clients or search_clients | default(1) }}
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 50
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "range",
           "operation": "range",
-          "warmup-iterations": {{ range_warmup_iterations or warmup_iterations | default(100) | tojson }},
-          "iterations": {{ range_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ range_target_throughput or target_throughput | default(1) | tojson }},
-          "clients": {{ range_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 100,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 1
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "name": "range-all-processors-search-pipeline",
@@ -567,10 +1251,17 @@
           "request-params": {
             "search-pipeline": "http-log-all-processors-search-pipeline"
           },
-          "warmup-iterations": {{ range_warmup_iterations or warmup_iterations | default(100) | tojson }},
-          "iterations": {{ range_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ range_target_throughput or target_throughput | default(1) | tojson }},
-          "clients": {{ range_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 100,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 1
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         }
       ]
     }

@@ -3,15 +3,31 @@
       "description": "Indexes the whole document corpus using a setup that will lead to a larger indexing throughput than the default settings and produce a smaller index (higher compression rate). Document ids are unique so all index operations are append only. After that a couple of queries are run.",
       "default": true,
       "schedule": [
-        {{ benchmark.collect(parts="../../common_operations/delete_index.json") }},
-        {% with default_index_settings={
-          "index.codec": "best_compression",
-          "index.refresh_interval": "30s",
-          "index.translog.flush_threshold_size": "4g"
-        } %}
-        {{ benchmark.collect(parts="../../common_operations/create_index.json") }},
-        {% endwith %}
-        {{ benchmark.collect(parts="../../common_operations/check_cluster_health.json") }},
+        {
+          "operation": "delete-index"
+        },
+        {
+          "operation": {
+            "operation-type": "create-index",
+            "settings": {%- if index_settings is defined %} {{index_settings | tojson}} {%- else %} {
+              "index.codec": "best_compression",
+              "index.refresh_interval": "30s",
+              "index.translog.flush_threshold_size": "4g"
+            }{%- endif %}
+          }
+        },
+        {
+          "name": "check-cluster-health",
+          "operation": {
+            "operation-type": "cluster-health",
+            "index": "nyc_taxis",
+            "request-params": {
+              "wait_for_status": "{{cluster_health | default('green')}}",
+              "wait_for_no_relocating_shards": "true"
+            },
+            "retry-until-success": true
+          }
+        },
         {
           "operation": "index",
           "warmup-time-period": 240,
@@ -22,55 +38,118 @@
           "name": "refresh-after-index",
           "operation": "refresh"
         },
-        {{ benchmark.collect(parts="../../common_operations/force_merge.json") }},
+        {
+          "operation": {
+            "operation-type": "force-merge",
+            "request-timeout": 7200{%- if force_merge_max_num_segments is defined %},
+            "max-num-segments": {{ force_merge_max_num_segments | tojson }}
+            {%- endif %}
+          }
+        },
+        {
+          "name": "refresh-after-force-merge",
+          "operation": "refresh"
+        },
+        {
+          "operation": "wait-until-merges-finish"
+        },
         {
           "operation": "default",
-          "warmup-iterations": {{ default_warmup_iterations or warmup_iterations | default(50) | tojson }},
-          "iterations": {{ default_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ default_target_throughput or target_throughput | default(3) | tojson }},
-          "clients": {{ default_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 50,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 3
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "range",
-          "warmup-iterations": {{ range_warmup_iterations or warmup_iterations | default(50) | tojson }},
-          "iterations": {{ range_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ range_target_throughput or target_throughput | default(0.7) | tojson }},
-          "clients": {{ range_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 50,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.7
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "distance_amount_agg",
-          "warmup-iterations": {{ distance_amount_agg_warmup_iterations or warmup_iterations | default(50) | tojson }},
-          "iterations": {{ distance_amount_agg_iterations or iterations | default(50) | tojson }},
-          "target-throughput": {{ distance_amount_agg_target_throughput or target_throughput | default(2) | tojson }},
-          "clients": {{ distance_amount_agg_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 50,
+          "iterations": 50
+          {%- if not target_throughput %}
+          ,"target-throughput": 2
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "autohisto_agg",
-          "warmup-iterations": {{ autohisto_agg_warmup_iterations or warmup_iterations | default(50) | tojson }},
-          "iterations": {{ autohisto_agg_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ autohisto_agg_target_throughput or target_throughput | default(1.5) | tojson }},
-          "clients": {{ autohisto_agg_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 50,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 1.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "date_histogram_agg",
-          "warmup-iterations": {{ date_histogram_agg_warmup_iterations or warmup_iterations | default(50) | tojson }},
-          "iterations": {{ date_histogram_agg_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ date_histogram_agg_target_throughput or target_throughput | default(1.5) | tojson }},
-          "clients": {{ date_histogram_agg_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 50,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 1.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "desc_sort_tip_amount",
-          "warmup-iterations": {{ desc_sort_tip_amount_warmup_iterations or warmup_iterations | default(50) | tojson }},
-          "iterations": {{ desc_sort_tip_amount_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ desc_sort_tip_amount_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ desc_sort_tip_amount_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 50,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         },
         {
           "operation": "asc_sort_tip_amount",
-          "warmup-iterations": {{ asc_sort_tip_amount_warmup_iterations or warmup_iterations | default(50) | tojson }},
-          "iterations": {{ asc_sort_tip_amount_iterations or iterations | default(100) | tojson }},
-          "target-throughput": {{ asc_sort_tip_amount_target_throughput or target_throughput | default(0.5) | tojson }},
-          "clients": {{ asc_sort_tip_amount_search_clients or search_clients | default(1) }}
+          "warmup-iterations": 50,
+          "iterations": 100
+          {%- if not target_throughput %}
+          ,"target-throughput": 0.5
+          {%- elif target_throughput is string and target_throughput.lower() == 'none' %}
+          {%- else %}
+          ,"target-throughput": {{ target_throughput | tojson }}
+          {%- endif %}
+          {%-if search_clients is defined and search_clients %}
+          ,"clients": {{ search_clients | tojson}}
+          {%- endif %}
         }
       ]
     },
@@ -78,15 +157,31 @@
       "name": "append-no-conflicts-index-only",
       "description": "Indexes the whole document corpus using a setup that will lead to a larger indexing throughput than the default settings and produce a smaller index (higher compression rate). Document ids are unique so all index operations are append only.",
       "schedule": [
-        {{ benchmark.collect(parts="../../common_operations/delete_index.json") }},
-        {% with default_index_settings={
-          "index.codec": "best_compression",
-          "index.refresh_interval": "30s",
-          "index.translog.flush_threshold_size": "4g"
-        } %}
-        {{ benchmark.collect(parts="../../common_operations/create_index.json") }},
-        {% endwith %}
-        {{ benchmark.collect(parts="../../common_operations/check_cluster_health.json") }},
+        {
+          "operation": "delete-index"
+        },
+        {
+          "operation": {
+            "operation-type": "create-index",
+            "settings": {%- if index_settings is defined %} {{index_settings | tojson}} {%- else %} {
+              "index.codec": "best_compression",
+              "index.refresh_interval": "30s",
+              "index.translog.flush_threshold_size": "4g"
+            }{%- endif %}
+          }
+        },
+        {
+          "name": "check-cluster-health",
+          "operation": {
+            "operation-type": "cluster-health",
+            "index": "nyc_taxis",
+            "request-params": {
+              "wait_for_status": "{{cluster_health | default('green')}}",
+              "wait_for_no_relocating_shards": "true"
+            },
+            "retry-until-success": true
+          }
+        },
         {
           "operation": "index",
           "warmup-time-period": 240,
@@ -97,24 +192,54 @@
           "name": "refresh-after-index",
           "operation": "refresh"
         },
-        {{ benchmark.collect(parts="../../common_operations/force_merge.json") }}
+        {
+          "operation": {
+            "operation-type": "force-merge",
+            "request-timeout": 7200{%- if force_merge_max_num_segments is defined %},
+            "max-num-segments": {{ force_merge_max_num_segments | tojson }}
+            {%- endif %}
+          }
+        },
+        {
+          "name": "refresh-after-force-merge",
+          "operation": "refresh"
+        },
+        {
+          "operation": "wait-until-merges-finish"
+        }
       ]
     },
     {
       "name": "append-sorted-no-conflicts-index-only",
       "description": "Indexes the whole document corpus in an index sorted by pickup_datetime field in descending order (most recent first) and using a setup that will lead to a larger indexing throughput than the default settings and produce a smaller index (higher compression rate). Document ids are unique so all index operations are append only.",
       "schedule": [
-        {{ benchmark.collect(parts="../../common_operations/delete_index.json") }},
-        {% with default_index_settings={
-          "index.codec": "best_compression",
-          "index.refresh_interval": "30s",
-          "index.translog.flush_threshold_size": "4g",
-          "index.sort.field": "pickup_datetime",
-          "index.sort.order": "desc"
-        } %}
-        {{ benchmark.collect(parts="../../common_operations/create_index.json") }},
-        {% endwith %}
-        {{ benchmark.collect(parts="../../common_operations/check_cluster_health.json") }},
+        {
+          "operation": "delete-index"
+        },
+        {
+          "operation": {
+            "operation-type": "create-index",
+            "settings": {%- if index_settings is defined %} {{index_settings | tojson}} {%- else %} {
+              "index.codec": "best_compression",
+              "index.refresh_interval": "30s",
+              "index.translog.flush_threshold_size": "4g",
+              "index.sort.field": "pickup_datetime",
+              "index.sort.order": "desc"
+            }{%- endif %}
+          }
+        },
+        {
+          "name": "check-cluster-health",
+          "operation": {
+            "operation-type": "cluster-health",
+            "index": "nyc_taxis",
+            "request-params": {
+              "wait_for_status": "{{cluster_health | default('green')}}",
+              "wait_for_no_relocating_shards": "true"
+            },
+            "retry-until-success": true
+          }
+        },
         {
           "operation": "index",
           "warmup-time-period": 240,
@@ -125,21 +250,51 @@
           "name": "refresh-after-index",
           "operation": "refresh"
         },
-        {{ benchmark.collect(parts="../../common_operations/force_merge.json") }}
+        {
+          "operation": {
+            "operation-type": "force-merge",
+            "request-timeout": 7200{%- if force_merge_max_num_segments is defined %},
+            "max-num-segments": {{ force_merge_max_num_segments | tojson }}
+            {%- endif %}
+          }
+        },
+        {
+          "name": "refresh-after-force-merge",
+          "operation": "refresh"
+        },
+        {
+          "operation": "wait-until-merges-finish"
+        }
       ]
     },
     {
       "name": "update",
       "schedule": [
-        {{ benchmark.collect(parts="../../common_operations/delete_index.json") }},
-        {% with default_index_settings={
-          "index.number_of_shards": number_of_shards | default(1),
-          "index.number_of_replicas": number_of_replicas | default(0),
-          "index.store.type": store_type | default('fs')
-        } %}
-        {{ benchmark.collect(parts="../../common_operations/create_index.json") }},
-        {% endwith %}
-        {{ benchmark.collect(parts="../../common_operations/check_cluster_health.json") }},
+        {
+          "operation": "delete-index"
+        },
+        {
+          "operation": {
+            "operation-type": "create-index",
+            "settings": {%- if index_settings is defined %} {{index_settings | tojson}} {%- else %} {
+              "index.number_of_shards": {{number_of_shards | default(1)}},
+              "index.number_of_replicas": {{number_of_replicas | default(0)}},
+              "index.store.type": "{{store_type | default('fs')}}"
+            }{%- endif %}
+          }
+        },
+        {
+          "name": "check-cluster-health",
+          "operation": {
+            "operation-type": "cluster-health",
+            "index": "nyc_taxis",
+            "request-params": {
+              "wait_for_status": "{{cluster_health | default('green')}}",
+              "wait_for_no_relocating_shards": "true"
+            },
+            "retry-until-success": true
+          }
+        },
         {
           "operation": "update",
           "warmup-time-period": 1200,
@@ -150,6 +305,20 @@
           "name": "refresh-after-index",
           "operation": "refresh"
         },
-        {{ benchmark.collect(parts="../../common_operations/force_merge.json") }}
+        {
+          "operation": {
+            "operation-type": "force-merge",
+            "request-timeout": 7200{%- if force_merge_max_num_segments is defined %},
+            "max-num-segments": {{ force_merge_max_num_segments | tojson }}
+            {%- endif %}
+          }
+        },
+        {
+          "name": "refresh-after-force-merge",
+          "operation": "refresh"
+        },
+        {
+          "operation": "wait-until-merges-finish"
+        }
       ]
     }
