@@ -8,6 +8,7 @@
         {%- if target_index_replica_shards is defined %}
         ,"number_of_replicas": {{ target_index_replica_shards }}
         {%- endif %}
+        ,"refresh_interval": "60s"
       }
     },
     "mappings": {

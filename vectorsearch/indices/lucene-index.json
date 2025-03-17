@@ -11,6 +11,7 @@
         {%- if hnsw_ef_search is defined and hnsw_ef_search %}
         ,"knn.algo_param.ef_search": {{ hnsw_ef_search }}
         {%- endif %}
+        ,"refresh_interval": "60s"
       }
     },
     "mappings": {
