@@ -99,7 +99,7 @@
       "name": "wait-for-snapshot-recovery",
       "operation": {
         "operation-type": "wait-for-recovery",
-        "index": "big5"
+        "index": "target_index"
       }
     },
     {{ benchmark.collect(parts="common/index-only-schedule.json") }},
