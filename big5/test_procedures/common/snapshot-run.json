@@ -367,4 +367,11 @@
 "iterations": {{ test_iterations | default(100) | tojson }},
 "target-throughput": {{ target_throughput | default(2) | tojson }},
 "clients": {{ search_clients | default(1) }}
+},
+{
+"operation": "cardinality-agg-very-high",
+"warmup-iterations": {{ warmup_iterations | default(50) | tojson }},
+"iterations": {{ test_iterations | default(100) | tojson }},
+"target-throughput": {{ target_throughput | default(2) | tojson }},
+"clients": {{ search_clients | default(1) }}
 }
