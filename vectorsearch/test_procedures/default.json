@@ -106,4 +106,43 @@
     {{ benchmark.collect(parts="common/force-merge-schedule.json") }},
     {{ benchmark.collect(parts="common/search-only-schedule.json") }}
   ]
+},
+{
+  
+    "name": "gpu-based-vector-test",
+    "description": "Perform vectorsearch benchmark on gpu based vector",
+    "default": false,
+    "schedule": [
+      {
+        "name": "register-snapshot-repository",
+        "operation": {
+          "operation-type": "create-snapshot-repository",
+          "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
+          "body": {
+            "type": "s3",
+            "settings": {
+              "bucket": {{ snapshot_bucket_name | default('test-snapshot-bucket') | tojson }},
+              "region": {{ snapshot_region | default('us-east-1') | tojson }},
+              "base_path": {{ snapshot_base_path | default('test-base-path') | tojson }}
+            }
+          }
+        }
+      },
+      {
+        "name": "apply-gpu-vector-settings",
+        "operation": {
+          "operation-type": "put-settings",
+          "body": {
+            "persistent" : {
+                "knn.remote_index_build.vector_repo" : {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
+                "knn.feature.remote_index_build.enabled" : true,
+                "knn.remote_index_build.client.endpoint" : {{ client_endpoint | default('test-endpoint') | tojson }},
+            }
+          }
+        }
+      },
+      {{ benchmark.collect(parts="common/index-only-schedule.json") }},
+      {{ benchmark.collect(parts="common/force-merge-schedule.json") }},
+      {{ benchmark.collect(parts="common/search-only-schedule.json") }}
+    ]
 }
