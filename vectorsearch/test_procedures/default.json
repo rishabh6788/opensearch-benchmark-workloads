@@ -136,7 +136,7 @@
             "persistent" : {
                 "knn.remote_index_build.vector_repo" : {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
                 "knn.feature.remote_index_build.enabled" : true,
-                "knn.remote_index_build.client.endpoint" : {{ client_endpoint | default('test-endpoint') | tojson }},
+                "knn.remote_index_build.client.endpoint" : {{ client_endpoint | default('test-endpoint') | tojson }}
             }
           }
         }
