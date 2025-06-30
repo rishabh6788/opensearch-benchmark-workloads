@@ -539,6 +539,20 @@
 {%-if search_clients is defined and search_clients %}
 ,"clients": {{ search_clients | tojson}}
 {%- endif %}
+},
+{
+          "operation": "desc_sort_passenger_count",
+          "warmup-iterations": {{ desc_sort_passenger_count_warmup_iterations or warmup_iterations | default(50) | tojson }},
+          "iterations": {{ desc_sort_passenger_count_iterations or iterations | default(100) | tojson }},
+          "target-throughput": {{ desc_sort_passenger_count_target_throughput or target_throughput | default(2) | tojson }},
+          "clients": {{ desc_sort_passenger_count_search_clients or search_clients | default(1) }}
+},
+{
+          "operation": "asc_sort_passenger_count",
+          "warmup-iterations": {{ asc_sort_passenger_count_warmup_iterations or warmup_iterations | default(50) | tojson }},
+          "iterations": {{ asc_sort_passenger_count_iterations or iterations | default(100) | tojson }},
+          "target-throughput": {{ asc_sort_passenger_count_target_throughput or target_throughput | default(2) | tojson }},
+          "clients": {{ asc_sort_passenger_count_search_clients or search_clients | default(1) }}
 }
     ]
   }
