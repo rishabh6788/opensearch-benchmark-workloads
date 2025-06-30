@@ -23,7 +23,7 @@
         "query": {
           "term": {
             "log.file.path": {
-              "value": "/var/log/messages/birdknight"
+              "value": "/var/log/messages/fuschiashoulder"
             }
           }
         }
@@ -95,7 +95,11 @@
           "by_hour": {
             "date_histogram": {
               "field": "@timestamp",
-              "calendar_interval": "hour"
+              {% if distribution_version.split('.') | map('int') | list < "6.0.0".split('.') | map('int') | list or distribution_version.split('.') | map('int') | list >= "7.0.0".split('.') | map('int') | list %}
+                "calendar_interval": "hour"
+              {% else %}
+                "interval": "hour"
+              {% endif %}
             }
           }
         }
@@ -119,7 +123,11 @@
           "by_hour": {
             "date_histogram": {
               "field": "@timestamp",
-              "calendar_interval": "minute"
+              {% if distribution_version.split('.') | map('int') | list < "6.0.0".split('.') | map('int') | list or distribution_version.split('.') | map('int') | list >= "7.0.0".split('.') | map('int') | list %}
+                "calendar_interval": "minute"
+              {% else %}
+                "interval": "minute"
+              {% endif %}
             }
           }
         }
@@ -162,7 +170,11 @@
         "sort" : [
           {"@timestamp" : "desc"}
         ],
-        "search_after": ["2023-01-06T23:59:58.000Z"]
+	{% if distribution_version.split('.') | map('int') | list < "6.0.0".split('.') | map('int') | list or distribution_version.split('.') | map('int') | list >= "7.0.0".split('.') | map('int') | list %}
+          "search_after": ["2023-01-01T23:59:58.000Z"]
+	{% else %}
+          "search_after": [1673049598]
+	{% endif %}
       }
     },
     {
@@ -190,7 +202,11 @@
         "sort" : [
           {"@timestamp" : "asc"}
         ],
-        "search_after": ["2023-01-01T23:59:58.000Z"]
+	{% if distribution_version.split('.') | map('int') | list < "6.0.0".split('.') | map('int') | list or distribution_version.split('.') | map('int') | list >= "7.0.0".split('.') | map('int') | list %}
+          "search_after": ["2023-01-01T23:59:58.000Z"]
+	{% else %}
+          "search_after": [1673049598]
+	{% endif %}
       }
     },
     {
@@ -371,7 +387,7 @@
       "operation-type": "search",
       "request-timeout": 7200,
       "index": "{{index_name | default('big5')}}",
-      "body":
+      "body": 
         {
           "track_total_hits": false,
           "size": 0,
@@ -808,7 +824,11 @@
           "logs": {
             "composite": {
               "sources": [
-                { "date": { "date_histogram": { "field": "@timestamp", "calendar_interval": "day" } } }
+		{% if distribution_version.split('.') | map('int') | list < "6.0.0".split('.') | map('int') | list or distribution_version.split('.') | map('int') | list >= "7.0.0".split('.') | map('int') | list %}
+                  { "date": { "date_histogram": { "field": "@timestamp", "calendar_interval": "day" } } }
+		{% else %}
+                  { "date": { "date_histogram": { "field": "@timestamp", "interval": "day" } } }
+		{% endif %}
               ]
             }
           }
@@ -862,7 +882,7 @@
         }
       }
     },
-   {
+    {
       "name": "cardinality-agg-high",
       "operation-type": "search",
       "index": "{{index_name | default('big5')}}",
@@ -871,14 +891,17 @@
         "aggs": {
           "agent": {
             "cardinality": {
-            "field": "agent.name"
+             "field": "agent.name"
+              {% if distribution_version.split('.') | map('int') | list  >= "2.19.1".split('.') | map('int') | list and distribution_version.split('.') | map('int') | list  < "6.0.0".split('.') | map('int') | list %}
+                , "execution_hint": "ordinals"
+              {% endif %}
             }
           }
         }
-     }
+      }
     },
     {
-      "name": "cardinality-agg-very-high",
+      "name": "cardinality-agg-high-2",
       "operation-type": "search",
       "index": "{{index_name | default('big5')}}",
       "request-timeout": 1800,
@@ -887,10 +910,8 @@
         "aggs": {
           "agent": {
             "cardinality": {
-              "field": "{{cardinality_agg_high_field | default('event.id')}}"
-              {% if distribution_version.split('.') | map('int') | list  >= "2.19.1".split('.') | map('int') | list and distribution_version.split('.') | map('int') | list  < "6.0.0".split('.') | map('int') | list %}
-              ,"execution_hint":"ordinals"
-              {% endif %}
+             "field": "event.id",
+             "execution_hint":"ordinals"
             }
           }
         }
@@ -964,6 +985,42 @@
               "order": "asc"
             }
           }
+        ]
+      }
+    },
+    {
+      "name": "range_with_asc_sort",
+      "operation-type": "search",
+      "index": "{{ index_name | default('big5') }}",
+      "body": {
+        "query": {
+          "range": {
+            "@timestamp": {
+              "gte": "2023-01-01T00:00:00",
+              "lte":  "2023-01-13T00:00:00"
+            }
+          }
+        },
+        "sort": [
+          { "@timestamp": "asc" }
+        ]
+      }
+    },
+    {
+      "name": "range_with_desc_sort",
+      "operation-type": "search",
+      "index": "{{ index_name | default('big5') }}",
+      "body": {
+        "query": {
+          "range": {
+            "@timestamp": {
+              "gte": "2023-01-01T00:00:00",
+              "lte":  "2023-01-13T00:00:00"
+            }
+          }
+        },
+        "sort": [
+          { "@timestamp": "desc" }
         ]
       }
     }
