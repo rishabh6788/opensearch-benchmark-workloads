@@ -901,7 +901,7 @@
       }
     },
     {
-      "name": "cardinality-agg-high-2",
+      "name": "cardinality-agg-very-high",
       "operation-type": "search",
       "index": "{{index_name | default('big5')}}",
       "request-timeout": 1800,
