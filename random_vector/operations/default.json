@@ -1,0 +1,28 @@
+{
+  "name": "check-cluster-health",
+  "operation-type": "cluster-health",
+  "request-params": {
+    "wait_for_status": "green"
+  },
+  "retry-until-success": true,
+  "include-in-reporting": false
+},
+{
+  "name": "random-bulk-indexing",
+  "operation-type": "bulk",
+  "param-source": "random-bulk-param-source",
+  "dims": {{ dims | default(128) | int }},
+  "index_name": "{{ target_index_name | default('knn-index-1') }}",
+  "partitions": {{ partitions | default(1000) | int }},
+  "bulk-size": {{ index_bulk_size | default(1000)}}
+},
+{
+  "name": "brute-force-filtered-search",
+  "operation-type": "search",
+  "param-source": "knn-param-source",
+  "dims": {{ dims | default(128) | int }},
+  "partitions": {{ partitions | default(1000) | int }},
+  "rescore-oversample": {{ rescore_oversample | default(0) | int }},
+  "index_name": "{{ target_index_name | default('knn-index-1') }}"
+}
+
