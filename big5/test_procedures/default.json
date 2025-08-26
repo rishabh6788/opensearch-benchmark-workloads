@@ -18,4 +18,12 @@
   "schedule": [
     {{ benchmark.collect(parts="common/snapshot-run.json") }}
   ]
+},
+{
+  "name": "ppl",
+  "default": false,
+  "schedule": [
+    {{ benchmark.collect(parts="common/snapshot-ops.json") }},
+    {{ benchmark.collect(parts="ppl/ppl-schedule.json") }}
+  ]
 }
