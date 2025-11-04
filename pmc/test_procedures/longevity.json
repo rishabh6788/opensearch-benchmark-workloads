@@ -90,37 +90,37 @@
           },
           {
             "operation": "match-all",
-            "time-period": {{ default_time_period or time_period | default(300) | tojson }}
+            "time-period": {{ default_time_period or time_period | default(300) | tojson }},
             "target-throughput": {{ default_target_throughput or target_throughput | default(20) | tojson }},
             "clients": {{ default_search_clients or search_clients | default(1) }}
           },
           {
             "operation": "term",
-            "time-period": {{ default_time_period or time_period | default(300) | tojson }}
+            "time-period": {{ default_time_period or time_period | default(300) | tojson }},
             "target-throughput": {{ term_target_throughput or target_throughput | default(20) | tojson }},
             "clients": {{ term_search_clients or search_clients | default(1) }}
           },
           {
             "operation": "phrase",
-            "time-period": {{ default_time_period or time_period | default(300) | tojson }}
+            "time-period": {{ default_time_period or time_period | default(300) | tojson }},
             "target-throughput": {{ phrase_target_throughput or target_throughput | default(20) | tojson }},
             "clients": {{ phrase_search_clients or search_clients | default(1) }}
           },
           {
             "operation": "articles_monthly_agg_uncached",
-            "time-period": {{ default_time_period or time_period | default(300) | tojson }}
+            "time-period": {{ default_time_period or time_period | default(300) | tojson }},
             "target-throughput": {{ articles_monthly_agg_uncached_target_throughput or target_throughput | default(20) | tojson }},
             "clients": {{ articles_monthly_agg_uncached_search_clients or search_clients | default(1) }}
           },
           {
             "operation": "articles_monthly_agg_cached",
-            "time-period": {{ default_time_period or time_period | default(300) | tojson }}
+            "time-period": {{ default_time_period or time_period | default(300) | tojson }},
             "target-throughput": {{ articles_monthly_agg_cached_target_throughput or target_throughput | default(20) | tojson }},
             "clients": {{ articles_monthly_agg_cached_search_clients or search_clients | default(1) }}
           },
           {
             "operation": "scroll",
-            "time-period": {{ default_time_period or time_period | default(300) | tojson }}
+            "time-period": {{ default_time_period or time_period | default(300) | tojson }},
             "target-throughput": {{ scroll_target_throughput or target_throughput | default(0.5) | tojson }},
             "clients": {{ scroll_search_clients or search_clients | default(1) }}
           },
@@ -141,7 +141,7 @@
                 "operation": {
                   "operation-type": "raw-request",
                   "method": "POST",
-                  "path": "/nyc_taxis/_refresh",
+                  "path": "/pmc/_refresh",
                   "request-timeout": 60
                 },
                 "clients": 1,
@@ -204,37 +204,37 @@
           },
           {
             "operation": "match-all",
-            "time-period": {{ default_time_period or time_period | default(300) | tojson }}
+            "time-period": {{ default_time_period or time_period | default(300) | tojson }},
             "target-throughput": {{ default_target_throughput or target_throughput | default(20) | tojson }},
             "clients": {{ default_search_clients or search_clients | default(1) }}
           },
           {
             "operation": "term",
-            "time-period": {{ default_time_period or time_period | default(300) | tojson }}
+            "time-period": {{ default_time_period or time_period | default(300) | tojson }},
             "target-throughput": {{ term_target_throughput or target_throughput | default(20) | tojson }},
             "clients": {{ term_search_clients or search_clients | default(1) }}
           },
           {
             "operation": "phrase",
-            "time-period": {{ default_time_period or time_period | default(300) | tojson }}
+            "time-period": {{ default_time_period or time_period | default(300) | tojson }},
             "target-throughput": {{ phrase_target_throughput or target_throughput | default(20) | tojson }},
             "clients": {{ phrase_search_clients or search_clients | default(1) }}
           },
           {
             "operation": "articles_monthly_agg_uncached",
-            "time-period": {{ default_time_period or time_period | default(300) | tojson }}
+            "time-period": {{ default_time_period or time_period | default(300) | tojson }},
             "target-throughput": {{ articles_monthly_agg_uncached_target_throughput or target_throughput | default(20) | tojson }},
             "clients": {{ articles_monthly_agg_uncached_search_clients or search_clients | default(1) }}
           },
           {
             "operation": "articles_monthly_agg_cached",
-            "time-period": {{ default_time_period or time_period | default(300) | tojson }}
+            "time-period": {{ default_time_period or time_period | default(300) | tojson }},
             "target-throughput": {{ articles_monthly_agg_cached_target_throughput or target_throughput | default(20) | tojson }},
             "clients": {{ articles_monthly_agg_cached_search_clients or search_clients | default(1) }}
           },
           {
             "operation": "scroll",
-            "time-period": {{ default_time_period or time_period | default(300) | tojson }}
+            "time-period": {{ default_time_period or time_period | default(300) | tojson }},
             "target-throughput": {{ scroll_target_throughput or target_throughput | default(0.5) | tojson }},
             "clients": {{ scroll_search_clients or search_clients | default(1) }}
           },
@@ -255,7 +255,7 @@
                 "operation": {
                   "operation-type": "raw-request",
                   "method": "POST",
-                  "path": "/nyc_taxis/_refresh",
+                  "path": "/pmc/_refresh",
                   "request-timeout": 60
                 },
                 "clients": 1,
