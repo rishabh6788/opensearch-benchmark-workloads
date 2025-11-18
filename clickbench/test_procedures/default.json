@@ -62,4 +62,4 @@
     },
     {{ benchmark.collect(parts="common/mustang-clickbench-schedule.json") }}
   ]
-},
+}
