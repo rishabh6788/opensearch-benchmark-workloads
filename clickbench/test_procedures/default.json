@@ -54,6 +54,35 @@
     {{ benchmark.collect(parts="../../common_operations/index_append.json") }},
     {% endwith %}
     {
+      "name": "refresh-after-index",
+      "operation": "refresh"
+    },
+    {
+      "operation": {
+      "operation-type": "force-merge",
+      "request-timeout": 7200{%- if max_num_segments is defined %},
+      "max-num-segments": {{ max_num_segments | tojson }}
+      {%- endif %}
+      }
+   },
+   {
+     "name": "refresh-after-force-merge",
+     "operation": "refresh"
+   },
+   {
+     "name": "wait-until-merges-finish",
+     "operation": {
+       "operation-type": "index-stats",
+       "index": "_all",
+       "condition": {
+         "path": "_all.total.merges.current",
+         "expected-value": 0
+       },
+      "retry-until-success": true,
+      "include-in-reporting": false
+    }
+   },
+    {
       "operation": "flush-index",
       "warmup-iterations": {{ flush_index_warmup_iterations or warmup_iterations | default(1) | tojson }},
       "iterations": {{ flush_index_iterations or test_iterations | default(1) | tojson }},
