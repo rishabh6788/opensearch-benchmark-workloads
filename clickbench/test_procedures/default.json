@@ -54,10 +54,6 @@
     {{ benchmark.collect(parts="../../common_operations/index_append.json") }},
     {% endwith %}
     {
-      "name": "refresh-after-index",
-      "operation": "refresh"
-    },
-    {
       "operation": {
       "operation-type": "force-merge",
       "request-timeout": 7200{%- if max_num_segments is defined %},
