@@ -13,23 +13,23 @@ def register(registry):
         PageFaultMetricsRunner(),
         async_runner=True
     )
+    registry.register_runner(
+        ClearPageCacheRunner.RUNNER_NAME,
+        ClearPageCacheRunner(),
+        async_runner=True
+    )
 
 request_context_holder = RequestContextHolder()
 
 class PageFaultMetricsRunner(Runner):
-    """
-    Calls refresh API then sends page fault metrics to port 8000
-    """
+
     RUNNER_NAME = "page-fault-metrics"
 
     async def __call__(self, opensearch, params):
-        index = params.get("index", "_all")
-        host = params.get("host", "opense-clust-mPxsPQAYPIgc-69bb44aacaf1e438.elb.us-east-1.amazonaws.com")
+        host = opensearch.transport.hosts[0].get('host')
         port = params.get("port", 8000)
         endpoint = params.get("endpoint", "/_send_pagefault_metrics")
         body = params.get("body", None)
-
-        result = {'success': False}
 
         # First, call refresh API (establishes request context)
         request_context_holder.on_client_request_start()
@@ -42,7 +42,33 @@ class PageFaultMetricsRunner(Runner):
             async with session.request("POST", url, json=body) as response:
                 status = response.status
                 logging.getLogger(__name__).info(f"API call to {url} completed with status {status}")
-                result['success'] = 200 <= status < 300
+
+        return None
+
+    def __repr__(self, *args, **kwargs):
+        return self.RUNNER_NAME
+
+class ClearPageCacheRunner(Runner):
+
+    RUNNER_NAME = "clear-page-cache"
+
+    async def __call__(self, opensearch, params):
+        host = opensearch.transport.hosts[0].get('host')
+        port = params.get("port", 8000)
+        endpoint = params.get("endpoint", "/_flush_page_cache")
+        body = params.get("body", None)
+
+        # First, call refresh API (establishes request context)
+        request_context_holder.on_client_request_start()
+        refresh_response = await opensearch.transport.perform_request("GET", "/_cluster/health")
+        request_context_holder.on_client_request_end()
+
+        # Then make HTTP call to port 8000
+        url = f"http://{host}:{port}{endpoint}"
+        async with aiohttp.ClientSession() as session:
+            async with session.request("POST", url, json=body) as response:
+                status = response.status
+                logging.getLogger(__name__).info(f"API call to {url} completed with status {status}")
 
         return None
 
