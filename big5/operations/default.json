@@ -387,7 +387,7 @@
       "operation-type": "search",
       "request-timeout": 7200,
       "index": "{{index_name | default('big5')}}",
-      "body": 
+      "body":
         {
           "track_total_hits": false,
           "size": 0,
@@ -1090,4 +1090,9 @@
           { "@timestamp": "desc" }
         ]
       }
+    },
+    {
+      "name": "send-page-fault-metrics",
+      "operation-type": "send-page-fault-metrics",
+      "payload": {}
     }
