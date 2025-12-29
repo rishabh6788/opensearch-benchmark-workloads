@@ -6,12 +6,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-1",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-1",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -25,12 +27,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-2",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-2",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -44,12 +48,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-02",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-02",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -63,12 +69,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-2",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-2",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -82,12 +90,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-3",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-3",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -101,12 +111,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-4",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-4",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -120,12 +132,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-5",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-5",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -139,12 +153,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-6",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-6",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -158,12 +174,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-7",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-7",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -178,12 +196,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-8",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-8",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -218,12 +238,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-9",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-9",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -237,12 +259,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-10",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-10",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -256,12 +280,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-11",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-11",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -275,12 +301,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-12",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-12",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -294,12 +322,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-13",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-13",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -313,12 +343,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-14",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-14",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -332,12 +364,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-15",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-15",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -351,12 +385,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-16",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-16",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -370,12 +406,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-17",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-17",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -389,12 +427,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-18",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-18",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -408,12 +448,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-19",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-19",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -427,12 +469,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-20",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-20",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -446,12 +490,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-21",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-21",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -465,12 +511,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-22",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-22",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -484,12 +532,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-23",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-23",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -503,12 +553,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-24",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-24",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -522,12 +574,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-25",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-25",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -541,12 +595,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-26",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-26",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -560,12 +616,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-27",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-27",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -579,12 +637,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-28",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-28",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -598,12 +658,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-29",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-29",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -617,12 +679,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-30",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-30",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -636,12 +700,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-31",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-31",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -655,12 +721,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-32",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-32",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -674,12 +742,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-33",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-33",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -693,12 +763,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-34",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-34",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -712,12 +784,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-35",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-35",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -731,12 +805,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-36",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-36",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -750,12 +826,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-37",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-37",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
@@ -769,12 +847,14 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "name": "page-fault-metrics-38",
   "operation": {
     "operation-type": "page-fault-metrics",
     "include-in-reporting": false
   }
 },
 {
+  "name": "clear-page-cache-38",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
