@@ -48,48 +48,6 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
-  "name": "page-fault-metrics-02",
-  "operation": {
-    "operation-type": "page-fault-metrics",
-    "include-in-reporting": false
-  }
-},
-{
-  "name": "clear-page-cache-02",
-  "operation": {
-    "operation-type": "clear-page-cache",
-    "include-in-reporting": false
-  }
-},
-{
-  "operation": "desc_sort_with_after_timestamp",
-  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
-  "iterations": {{ test_iterations | default(100) | tojson }},
-  "target-throughput": {{ target_throughput | default(2) | tojson }},
-  "clients": {{ search_clients | default(1) }}
-},
-{
-  "name": "page-fault-metrics-2",
-  "operation": {
-    "operation-type": "page-fault-metrics",
-    "include-in-reporting": false
-  }
-},
-{
-  "name": "clear-page-cache-2",
-  "operation": {
-    "operation-type": "clear-page-cache",
-    "include-in-reporting": false
-  }
-},
-{
-  "operation": "asc_sort_with_after_timestamp",
-  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
-  "iterations": {{ test_iterations | default(100) | tojson }},
-  "target-throughput": {{ target_throughput | default(2) | tojson }},
-  "clients": {{ search_clients | default(1) }}
-},
-{
   "name": "page-fault-metrics-3",
   "operation": {
     "operation-type": "page-fault-metrics",
@@ -104,7 +62,7 @@
   }
 },
 {
-  "operation": "desc_sort_timestamp_can_match_shortcut",
+  "operation": "desc_sort_with_after_timestamp",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -125,7 +83,7 @@
   }
 },
 {
-  "operation": "desc_sort_timestamp_no_can_match_shortcut",
+  "operation": "asc_sort_with_after_timestamp",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -146,7 +104,7 @@
   }
 },
 {
-  "operation": "asc_sort_timestamp_can_match_shortcut",
+  "operation": "desc_sort_timestamp_can_match_shortcut",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -167,7 +125,7 @@
   }
 },
 {
-  "operation": "asc_sort_timestamp_no_can_match_shortcut",
+  "operation": "desc_sort_timestamp_no_can_match_shortcut",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -188,8 +146,7 @@
   }
 },
 {
-  "name": "term",
-  "operation": "term",
+  "operation": "asc_sort_timestamp_can_match_shortcut",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -209,29 +166,8 @@
     "include-in-reporting": false
   }
 },
-{% if distribution_version.split('.') | map('int') | list  >= "2.11.0".split('.') | map('int') | list and distribution_version.split('.') | map('int') | list  < "6.0.0".split('.') | map('int') | list %}
-  {
-    "operation": "multi_terms-keyword",
-    "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
-    "iterations": {{ test_iterations | default(100) | tojson }},
-    "target-throughput": {{ target_throughput | default(2) | tojson }},
-    "clients": {{ search_clients | default(1) }}
-  },
-  {
-    "operation": {
-      "operation-type": "page-fault-metrics",
-      "include-in-reporting": false
-    }
-  },
-  {
-    "operation": {
-      "operation-type": "clear-page-cache",
-      "include-in-reporting": false
-    }
-  },
-{% endif %}
 {
-  "operation": "keyword-terms",
+  "operation": "asc_sort_timestamp_no_can_match_shortcut",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -252,7 +188,8 @@
   }
 },
 {
-  "operation": "keyword-terms-low-cardinality",
+  "name": "term",
+  "operation": "term",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -272,29 +209,31 @@
     "include-in-reporting": false
   }
 },
+{% if distribution_version.split('.') | map('int') | list  >= "2.11.0".split('.') | map('int') | list and distribution_version.split('.') | map('int') | list  < "6.0.0".split('.') | map('int') | list %}
+  {
+    "operation": "multi_terms-keyword",
+    "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+    "iterations": {{ test_iterations | default(100) | tojson }},
+    "target-throughput": {{ target_throughput | default(2) | tojson }},
+    "clients": {{ search_clients | default(1) }}
+  },
+  {
+    "name": "page-fault-metrics-11",
+    "operation": {
+      "operation-type": "page-fault-metrics",
+      "include-in-reporting": false
+    }
+  },
+  {
+    "name": "clear-page-cache-11",
+    "operation": {
+      "operation-type": "clear-page-cache",
+      "include-in-reporting": false
+    }
+  },
+{% endif %}
 {
-  "operation": "composite-terms",
-  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
-  "iterations": {{ test_iterations | default(100) | tojson }},
-  "target-throughput": {{ target_throughput | default(2) | tojson }},
-  "clients": {{ search_clients | default(1) }}
-},
-{
-  "name": "page-fault-metrics-11",
-  "operation": {
-    "operation-type": "page-fault-metrics",
-    "include-in-reporting": false
-  }
-},
-{
-  "name": "clear-page-cache-11",
-  "operation": {
-    "operation-type": "clear-page-cache",
-    "include-in-reporting": false
-  }
-},
-{
-  "operation": "composite_terms-keyword",
+  "operation": "keyword-terms",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -315,7 +254,7 @@
   }
 },
 {
-  "operation": "composite-date_histogram-daily",
+  "operation": "keyword-terms-low-cardinality",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -336,7 +275,7 @@
   }
 },
 {
-  "operation": "range",
+  "operation": "composite-terms",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -357,7 +296,7 @@
   }
 },
 {
-  "operation": "range-numeric",
+  "operation": "composite_terms-keyword",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -378,7 +317,7 @@
   }
 },
 {
-  "operation": "keyword-in-range",
+  "operation": "composite-date_histogram-daily",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -399,7 +338,7 @@
   }
 },
 {
-  "operation": "date_histogram_hourly_agg",
+  "operation": "range",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -420,7 +359,7 @@
   }
 },
 {
-  "operation": "date_histogram_minute_agg",
+  "operation": "range-numeric",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -441,7 +380,7 @@
   }
 },
 {
-  "operation": "scroll",
+  "operation": "keyword-in-range",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -462,7 +401,7 @@
   }
 },
 {
-  "operation": "query-string-on-message",
+  "operation": "date_histogram_hourly_agg",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -483,7 +422,7 @@
   }
 },
 {
-  "operation": "query-string-on-message-filtered",
+  "operation": "date_histogram_minute_agg",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -504,7 +443,7 @@
   }
 },
 {
-  "operation": "query-string-on-message-filtered-sorted-num",
+  "operation": "scroll",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -525,7 +464,7 @@
   }
 },
 {
-  "operation": "sort_keyword_can_match_shortcut",
+  "operation": "query-string-on-message",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -546,7 +485,7 @@
   }
 },
 {
-  "operation": "sort_keyword_no_can_match_shortcut",
+  "operation": "query-string-on-message-filtered",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -567,7 +506,7 @@
   }
 },
 {
-  "operation": "sort_numeric_desc",
+  "operation": "query-string-on-message-filtered-sorted-num",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -588,7 +527,7 @@
   }
 },
 {
-  "operation": "sort_numeric_asc",
+  "operation": "sort_keyword_can_match_shortcut",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -609,7 +548,7 @@
   }
 },
 {
-  "operation": "sort_numeric_desc_with_match",
+  "operation": "sort_keyword_no_can_match_shortcut",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -630,7 +569,7 @@
   }
 },
 {
-  "operation": "sort_numeric_asc_with_match",
+  "operation": "sort_numeric_desc",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -651,7 +590,7 @@
   }
 },
 {
-  "operation": "range_field_conjunction_big_range_big_term_query",
+  "operation": "sort_numeric_asc",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -672,7 +611,7 @@
   }
 },
 {
-  "operation": "range_field_disjunction_big_range_small_term_query",
+  "operation": "sort_numeric_desc_with_match",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -693,7 +632,7 @@
   }
 },
 {
-  "operation": "range_field_conjunction_small_range_small_term_query",
+  "operation": "sort_numeric_asc_with_match",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -714,7 +653,7 @@
   }
 },
 {
-  "operation": "range_field_conjunction_small_range_big_term_query",
+  "operation": "range_field_conjunction_big_range_big_term_query",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -735,7 +674,7 @@
   }
 },
 {
-  "operation": "range-auto-date-histo",
+  "operation": "range_field_disjunction_big_range_small_term_query",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -756,7 +695,7 @@
   }
 },
 {
-  "operation": "range-auto-date-histo-with-metrics",
+  "operation": "range_field_conjunction_small_range_small_term_query",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -777,7 +716,7 @@
   }
 },
 {
-  "operation": "range-agg-1",
+  "operation": "range_field_conjunction_small_range_big_term_query",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -798,7 +737,7 @@
   }
 },
 {
-  "operation": "range-agg-2",
+  "operation": "range-auto-date-histo",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -819,7 +758,7 @@
   }
 },
 {
-  "operation": "cardinality-agg-low",
+  "operation": "range-auto-date-histo-with-metrics",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -840,7 +779,7 @@
   }
 },
 {
-  "operation": "cardinality-agg-high",
+  "operation": "range-agg-1",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -855,6 +794,69 @@
 },
 {
   "name": "clear-page-cache-38",
+  "operation": {
+    "operation-type": "clear-page-cache",
+    "include-in-reporting": false
+  }
+},
+{
+  "operation": "range-agg-2",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "name": "page-fault-metrics-39",
+  "operation": {
+    "operation-type": "page-fault-metrics",
+    "include-in-reporting": false
+  }
+},
+{
+  "name": "clear-page-cache-39",
+  "operation": {
+    "operation-type": "clear-page-cache",
+    "include-in-reporting": false
+  }
+},
+{
+  "operation": "cardinality-agg-low",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "name": "page-fault-metrics-40",
+  "operation": {
+    "operation-type": "page-fault-metrics",
+    "include-in-reporting": false
+  }
+},
+{
+  "name": "clear-page-cache-40",
+  "operation": {
+    "operation-type": "clear-page-cache",
+    "include-in-reporting": false
+  }
+},
+{
+  "operation": "cardinality-agg-high",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "name": "page-fault-metrics-41",
+  "operation": {
+    "operation-type": "page-fault-metrics",
+    "include-in-reporting": false
+  }
+},
+{
+  "name": "clear-page-cache-41",
   "operation": {
     "operation-type": "clear-page-cache",
     "include-in-reporting": false
