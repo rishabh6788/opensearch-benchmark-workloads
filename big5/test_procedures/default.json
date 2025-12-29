@@ -26,4 +26,29 @@
     {{ benchmark.collect(parts="common/snapshot-ops.json") }},
     {{ benchmark.collect(parts="ppl/ppl-schedule.json") }}
   ]
+},
+{
+  "name": "page-cache-test",
+  "default": false,
+  "schedule": [
+    {
+      "operation": {
+        "operation-type": "page-fault-metrics",
+        "include-in-reporting": false
+      }
+    },
+    {
+      "operation": {
+      "operation-type": "clear-page-cache",
+      "include-in-reporting": false
+      }
+    }
+  ]
+},
+{
+  "name": "search-with-page-cache",
+  "default": false,
+  "schedule": [
+    {{ benchmark.collect(parts="common/search-with-page-cache-schedule.json") }}
+  ]
 }
