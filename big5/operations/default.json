@@ -37,8 +37,8 @@
         "query": {
           "range": {
             "@timestamp": {
-              "gte": "2023-01-01T00:00:00",
-              "lt": "2023-01-03T00:00:00"
+              "gte": {{ range_gte or gte | default("2023-01-01T00:00:00") | tojson }},
+              "lt": {{ range_lt or lt | default("2023-01-03T00:00:00") | tojson }}
             }
           }
         }
@@ -70,8 +70,8 @@
               {
                 "range": {
                   "@timestamp": {
-                    "gte": "2023-01-01T00:00:00",
-                    "lt": "2023-01-03T00:00:00"
+                    "gte": {{ keyword_in_range_gte or gte | default("2023-01-01T00:00:00") | tojson }},
+                    "lt": {{ keyword_in_range_lt or lt | default("2023-01-03T00:00:00") | tojson }}
                   }
                 }
               },
@@ -114,8 +114,8 @@
         "query": {
           "range": {
             "@timestamp": {
-              "gte": "2023-01-01T00:00:00",
-              "lt": "2023-01-03T00:00:00"
+              "gte": {{ date_histogram_minute_agg_gte or gte | default("2023-01-01T00:00:00") | tojson }},
+              "lt": {{ date_histogram_minute_agg_lt or lt | default("2023-01-03T00:00:00") | tojson }}
             }
           }
         },
@@ -394,8 +394,8 @@
           "query": {
             "range": {
               "@timestamp": {
-                "gte": "2023-01-01T00:00:00",
-                "lt": "2023-01-03T00:00:00"
+                "gte": {{ terms_significant_1_gte or gte | default("2023-01-01T00:00:00") | tojson }},
+                "lt": {{ terms_significant_1_lt or lt | default("2023-01-03T00:00:00") | tojson }}
               }
             }
           },
@@ -427,8 +427,8 @@
         "query": {
           "range": {
             "@timestamp": {
-              "gte": "2023-01-01T00:00:00",
-              "lt": "2023-01-03T00:00:00"
+              "gte": {{ terms_significant_2_gte or gte | default("2023-01-01T00:00:00") | tojson }},
+              "lt": {{ terms_significant_2_lt or lt | default("2023-01-03T00:00:00") | tojson }}
             }
           }
         },
@@ -799,8 +799,8 @@
         "query": {
           "range": {
             "@timestamp": {
-              "gte": "2023-01-05T00:00:00",
-              "lt": "2023-01-05T05:00:00"
+              "gte": {{ multi_terms_keyword_gte or gte | default("2023-01-05T00:00:00") | tojson }},
+              "lt": {{ multi_terms_keyword_lt or lt | default("2023-01-05T05:00:00") | tojson }}
             }
           }
         },
@@ -829,8 +829,8 @@
         "query": {
           "range": {
             "@timestamp": {
-              "gte": "2023-01-02T00:00:00",
-              "lt": "2023-01-02T10:00:00"
+              "gte": {{ composite_terms_gte or gte | default("2023-01-02T00:00:00") | tojson }},
+              "lt": {{ composite_terms_lt or lt | default("2023-01-02T10:00:00") | tojson }}
             }
           }
         },
@@ -855,8 +855,8 @@
         "query": {
           "range": {
             "@timestamp": {
-              "gte": "2023-01-02T00:00:00",
-              "lt": "2023-01-02T10:00:00"
+              "gte": {{ composite_terms_keyword_gte or gte | default("2023-01-02T00:00:00") | tojson }},
+              "lt": {{ composite_terms_keyword_lt or lt | default("2023-01-02T10:00:00") | tojson }}
             }
           }
         },
@@ -882,8 +882,8 @@
         "query": {
           "range": {
             "@timestamp": {
-              "gte": "2022-12-30T00:00:00",
-              "lt": "2023-01-07T12:00:00"
+              "gte": {{ composite_date_histogram_daily_gte or gte | default("2022-12-30T00:00:00") | tojson }},
+              "lt": {{ composite_date_histogram_daily_lt or lt | default("2023-01-07T12:00:00") | tojson }}
             }
           }
         },
@@ -1007,8 +1007,8 @@
               {
                 "range": {
                   "@timestamp": {
-                    "gte": "2023-01-03T00:00:00",
-                    "lt": "2023-01-03T10:00:00"
+                    "gte": {{ query_string_on_message_filtered_gte or gte | default("2023-01-03T00:00:00") | tojson }},
+                    "lt": {{ query_string_on_message_filtered_lt or lt | default("2023-01-03T10:00:00") | tojson }}
                   }
                 }
               },
@@ -1033,8 +1033,8 @@
               {
                 "range": {
                   "@timestamp": {
-                    "gte": "2023-01-03T00:00:00",
-                    "lt": "2023-01-03T10:00:00"
+                    "gte": {{ query_string_on_message_filtered_sorted_num_gte or gte | default("2023-01-03T00:00:00") | tojson }},
+                    "lt": {{ query_string_on_message_filtered_sorted_num_lt or lt | default("2023-01-03T10:00:00") | tojson }}
                   }
                 }
               },
@@ -1063,8 +1063,8 @@
         "query": {
           "range": {
             "@timestamp": {
-              "gte": "2023-01-01T00:00:00",
-              "lte":  "2023-01-13T00:00:00"
+              "gte": {{ range_with_asc_sort_gte or gte | default("2023-01-01T00:00:00") | tojson }},
+              "lte": {{ range_with_asc_sort_lte or lte | default("2023-01-13T00:00:00") | tojson }}
             }
           }
         },
@@ -1081,8 +1081,8 @@
         "query": {
           "range": {
             "@timestamp": {
-              "gte": "2023-01-01T00:00:00",
-              "lte":  "2023-01-13T00:00:00"
+              "gte": {{ range_with_desc_sort_gte or gte | default("2023-01-01T00:00:00") | tojson }},
+              "lte": {{ range_with_desc_sort_lte or lte | default("2023-01-13T00:00:00") | tojson }}
             }
           }
         },
