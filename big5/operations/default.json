@@ -86,6 +86,33 @@
       }
     },
     {
+      "name": "keyword-in-range-randomized",
+      "operation-type": "search",
+      "index": "{{index_name | default('big5')}}",
+      "param-source": "random-process-name-source",
+      "body": {
+        "query": {
+          "bool": {
+            "must": [
+              {
+                "range": {
+                  "@timestamp": {
+                    "gte": {{ keyword_in_range_gte or gte | default("2023-01-01T00:00:00") | tojson }},
+                    "lt": {{ keyword_in_range_lt or lt | default("2023-01-03T00:00:00") | tojson }}
+                  }
+                }
+              },
+              {
+                "match": {
+                  "process.name": "{{process_name}}"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
       "name": "date_histogram_hourly_agg",
       "operation-type": "search",
       "index": "{{index_name | default('big5')}}",

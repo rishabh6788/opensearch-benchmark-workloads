@@ -24,6 +24,15 @@
   "default": false,
   "schedule": [
     {{ benchmark.collect(parts="common/snapshot-ops.json") }},
+    {{ benchmark.collect(parts="ppl/ppl-schedule.json") }},
+    {{ benchmark.collect(parts="ppl/ppl-schedule-histogram-only.json") }}
+  ]
+},
+{
+  "name": "ppl-calcite-disabled",
+  "default": false,
+  "schedule": [
+    {{ benchmark.collect(parts="common/snapshot-ops.json") }},
     {{ benchmark.collect(parts="ppl/ppl-schedule.json") }}
   ]
 },
