@@ -37,6 +37,15 @@
   ]
 },
 {
+  "name": "intra-segment",
+  "description": "Runs search queries for testing intra-segment search",
+  "default": false,
+  "schedule": [
+    {{ benchmark.collect(parts="common/snapshot-ops.json") }},
+    {{ benchmark.collect(parts="intra_segment/intra-segment-schedule.json") }}
+  ]
+},
+{
   "name": "page-cache-test",
   "default": false,
   "schedule": [
