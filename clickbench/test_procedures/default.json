@@ -43,6 +43,17 @@
   ]
 },
 {
+  "name": "dsl-clickbench-streaming",
+  "description": "Runs a subset of DSL queries for streaming benchmarks. Includes Q13, Q16, Q22, Q34-Q39.",
+  "default": false,
+  "schedule": [
+    {% with default_index_settings={}, index_name="clickbench" %}
+    {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }},
+    {% endwith %}
+    {{ benchmark.collect(parts="dsl/dsl-clickbench-schedule-streaming.json") }}
+  ]
+},
+{
   "name": "datafusion-ppl",
   "description": "Indexes the ClickBench dataset and runs OpenSearch PPL queries to benchmark analytical use case performance. Specific to the datafusion branch.",
   "default": false,
