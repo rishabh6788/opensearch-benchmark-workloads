@@ -18,7 +18,7 @@
     {% if distribution_version.split('.') | map('int') | list  >= "2.11.0".split('.') | map('int') | list and distribution_version.split('.') | map('int') | list  < "6.0.0".split('.') | map('int') | list %}
       "index.merge.policy": "{{index_merge_policy | default('log_byte_size') }}",
     {% endif %}
-    "index.codec": "index.codec":"{{index_codec | default('best_compression') }}",
+    "index.codec":"{{index_codec | default('best_compression') }}",
     "index.translog.sync_interval": "30s",
     "index.translog.durability": "async",
     "index.query.default_field": [
