@@ -47,9 +47,7 @@
   "description": "Runs a subset of DSL queries for streaming benchmarks. Includes Q13, Q16, Q22, Q34-Q39.",
   "default": false,
   "schedule": [
-    {% with default_index_settings={}, index_name="clickbench" %}
-    {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }},
-    {% endwith %}
+    {{ benchmark.collect(parts="common/snapshot-ops.json") }},
     {{ benchmark.collect(parts="dsl/dsl-clickbench-schedule-streaming.json") }}
   ]
 },
