@@ -1,0 +1,39 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 3,
+      "number_of_replicas": 1,
+      "knn": true,
+      "knn.algo_param.ef_search": 256,
+      "translog.flush_threshold_size": "5120mb",
+      "knn.advanced.approximate_threshold": "-1"
+    }
+  },
+  "mappings": {
+    "_source" : {
+        "excludes" : [
+          "emb"
+        ],
+        "recovery_source_excludes" : [
+          "emb"
+        ]
+    },
+    "properties": {
+      "partition_id": {
+        "type": "keyword"
+      },
+      "emb" : {
+        "type" : "knn_vector",
+        "dimension" : {{ dims | default(128) | tojson }},
+        "method" : {
+          "engine" : "faiss",
+          "space_type" : "l2",
+          "name" : "hnsw",
+          "parameters" : {
+            "ef_construction" : 256
+          }
+        }
+      }
+    }
+  }
+}

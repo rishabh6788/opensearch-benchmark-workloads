@@ -1,0 +1,40 @@
+{
+  "settings": {
+    "index": {
+      "knn": true,
+      "number_of_shards": 3,
+      "number_of_replicas": 0,
+      "knn.algo_param.ef_search": 256
+    }
+  },
+  "mappings": {
+    "_source" : {
+        "excludes" : [
+          "emb"
+        ],
+        "recovery_source_excludes" : [
+          "emb"
+        ]
+    },
+    "properties": {
+      "partition_id": {
+        "type": "integer"
+      },
+      "emb" : {
+        "type" : "knn_vector",
+        "dimension" : {{ dims | default(128) | tojson }},
+        "method" : {
+          "engine" : "faiss",
+          "space_type" : "innerproduct",
+          "name" : "hnsw",
+          "parameters" : {
+            "ef_construction" : 256,
+	    "ef_search": 256,
+	    "m": 16
+          }
+        }
+      }
+    }
+  }
+}
+

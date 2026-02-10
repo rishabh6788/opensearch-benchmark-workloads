@@ -1,0 +1,36 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 3,
+      "knn": true,
+      "knn.algo_param.ef_search": 100
+    }
+  },
+  "mappings": {
+    "properties": {
+      "partition_id": {
+        "type": "keyword"
+      },
+      "emb" : {
+        "type" : "knn_vector",
+        "dimension" : {{ dims | default(128) | tojson }},
+        "method" : {
+          "engine" : "faiss",
+          "space_type" : "innerproduct",
+          "name" : "hnsw",
+          "parameters" : {
+            "ef_construction" : 256,
+            "encoder" : {
+              "name" : "sq",
+              "parameters" : {
+                "type" : "fp16",
+                "clip" : true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,44 @@
+{
+  "name": "check-cluster-health",
+  "operation-type": "cluster-health",
+  "request-params": {
+    "wait_for_status": "green"
+  },
+  "retry-until-success": true,
+  "include-in-reporting": false
+},
+{
+  "name": "random-bulk-indexing",
+  "operation-type": "bulk",
+  "param-source": "random-bulk-param-source",
+  "dims": {{ dims | default(128) | int }},
+  "index_name": "{{ target_index_name | default('knn-index-1') }}",
+  "partitions": {{ partitions | default(1000) | int }},
+  "bulk-size": {{ index_bulk_size | default(1000)}}
+},
+{
+    "name": "force-merge",
+    "operation-type": "force-merge",
+    "request-timeout": {{ target_index_force_merge_timeout | default(28800) }},
+    "index": "{{ target_index_name | default('target_index') }}",
+    "max-num-segments": {{ target_index_max_num_segments | default(1) }},
+    "mode":"polling",
+    "include-in-results_publishing": true
+},
+{
+    "name": "refresh-target-index",
+    "operation-type": "refresh",
+    "retries": 100,
+    "index": "{{ target_index_name | default('target_index') }}"
+},
+{
+  "name": "brute-force-filtered-search",
+  "operation-type": "search",
+  "detailed-results": true,
+  "param-source": "knn-param-source",
+  "dims": {{ dims | default(128) | int }},
+  "partitions": {{ partitions | default(1000) | int }},
+  "rescore-oversample": {{ rescore_oversample | default(0) | int }},
+  "index_name": "{{ target_index_name | default('knn-index-1') }}"
+}
+

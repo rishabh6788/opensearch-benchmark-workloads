@@ -1,0 +1,75 @@
+import random
+import time
+
+from osbenchmark.workload.params import ParamSource
+
+
+class RandomBulkParamSource(ParamSource):
+    def __init__(self, track, params, **kwargs):
+        super().__init__(track, params, **kwargs)
+        self._bulk_size = params.get("bulk-size", 1000)
+        self._index_name = params.get('index_name','test-index')
+        self._dims = params.get("dims", 128)
+        self._partitions = params.get("partitions", 1000)
+
+    def params(self):
+        import numpy as np
+
+        #timestamp = int(time.time()) * 1000
+        bulk_data = []
+        for _ in range(self._bulk_size):
+            vec = np.random.rand(self._dims)
+            partition_id = random.randint(0, self._partitions)
+            metadata = {"_index": self._index_name}
+            bulk_data.append({"create": metadata})
+            bulk_data.append({"partition_id": partition_id, "emb": vec.tolist()})
+
+        return {
+            "body": bulk_data,
+            "bulk-size": self._bulk_size,
+            "action-metadata-present": True,
+            "unit": "docs",
+            "index": self._index_name,
+            "type": "",
+        }
+
+
+def generate_knn_query(query_vector, partition_id, k, rescore_oversample):
+    return {
+        "docvalue_fields" : ["_id"],
+        "stored_fields" : "_none_",
+        "query":{
+            "knn": {
+                "emb": {
+                    "vector": query_vector,
+                    "k": k
+                }
+            }
+        }
+    }
+
+class RandomSearchParamSource:
+    def __init__(self, track, params, **kwargs):
+        self._index_name = params.get('index_name','test-index')
+        self._cache = params.get("cache", False)
+        self._partitions = params.get("partitions", 1000)
+        self._dims = params.get("dims", 128)
+        self._top_k = params.get("k", 10)
+        self._rescore_oversample = params.get("rescore-oversample", 0)
+        self.infinite = True
+
+    def partition(self, partition_index, total_partitions):
+        return self
+
+    def params(self):
+        import numpy as np
+
+        partition_id = random.randint(0, self._partitions)
+        query_vec = np.random.rand(self._dims).tolist()
+        query = generate_knn_query(query_vec, partition_id, self._top_k, self._rescore_oversample)
+        return {"index": self._index_name, "cache": self._cache, "size": self._top_k, "body": query}
+
+
+def register(registry):
+    registry.register_param_source("random-bulk-param-source", RandomBulkParamSource)
+    registry.register_param_source("knn-param-source", RandomSearchParamSource)
