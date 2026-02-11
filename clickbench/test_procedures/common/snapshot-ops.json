@@ -34,14 +34,14 @@
 "name": "wait-for-snapshot-recovery",
 "operation": {
 "operation-type": "wait-for-recovery",
-"index": "big5"
+"index": "clickbench"
 }
 },
 {
 "name": "check-cluster-health",
 "operation": {
 "operation-type": "cluster-health",
-"index": "big5",
+"index": "clickbench",
 "request-params": {
 "wait_for_status": "{{cluster_health | default('green')}}",
 "wait_for_no_relocating_shards": "true"
