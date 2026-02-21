@@ -32,6 +32,15 @@
   ]
 },
 {
+  "name": "dsl-clickbench-snapshot",
+  "description": "Indexes the whole document corpus using OpenSearch default settings and runs DSL (Domain-Specific Language) queries. The DSL queries were converted from PPL via OpenSearch's _plugins/_sql/_explain API.",
+  "default": false,
+  "schedule": [
+    {{ benchmark.collect(parts="common/snapshot-ops.json") }},
+    {{ benchmark.collect(parts="dsl/dsl-clickbench-schedule.json") }}
+  ]
+},
+{
   "name": "dsl-clickbench-test",
   "description": "Lightweight test procedure for validating ClickBench workload setup and basic functionality. Runs DSL (Domain-Specific Language) queries. The DSL queries were converted from PPL via OpenSearch's _plugins/_sql/_explain API.",
   "default": false,
