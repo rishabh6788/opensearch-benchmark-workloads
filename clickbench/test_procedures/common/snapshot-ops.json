@@ -34,6 +34,7 @@
 "name": "wait-for-snapshot-recovery",
 "operation": {
 "operation-type": "wait-for-recovery",
+"request-timeout": 7200,
 "index": "clickbench"
 }
 },
