@@ -6,12 +6,25 @@
         "index": "{{ target_index_name | default('target_index') }}"
     }
 },
+{          "name": "post-delete-sleep",
+          "operation": {
+            "operation-type": "sleep",
+            "duration": {{ post_delete_sleep_duration|default(120) }}
+          }
+},
 {
     "operation": {
         "name": "create-target-index",
         "operation-type": "create-index",
         "index": "{{ target_index_name | default('target_index') }}"
     }
+},
+{
+          "name": "post-create-sleep",
+          "operation": {
+            "operation-type": "sleep",
+            "duration": {{ post_create_sleep_duration|default(120) }}
+          }
 },
 {
     "operation": {
