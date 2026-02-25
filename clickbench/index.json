@@ -9,6 +9,9 @@
     "index.translog.durability": {{index_translog_durability | default("async") | tojson}},
     "index.sort.field": [ "CounterID", "EventDate", "UserID", "EventTime", "WatchID" ],
     "index.sort.order": [ "desc", "desc", "desc", "desc", "desc" ]
+    {%- if index_optimized_enabled is defined and index_optimized_enabled %}
+    ,"index.optimized.enabled": true
+    {%- endif %}
   },
   "mappings": {
     "dynamic": "false",
