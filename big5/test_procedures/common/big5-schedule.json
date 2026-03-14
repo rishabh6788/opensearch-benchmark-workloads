@@ -325,8 +325,8 @@
 },
 {
   "operation": "range-auto-date-histo-with-metrics",
-  "warmup-iterations": {{ warmup_iterations | default(50) | tojson }},
-  "iterations": {{ test_iterations | default(100) | tojson }},
+  "warmup-iterations": {{ warmup_iterations or range_auto_date_histo_w_met_warmup_iterations | default(50) | tojson }},
+  "iterations": {{ test_iterations or range_auto_date_histo_w_met_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
   "clients": {{ search_clients | default(1) }}
 },
