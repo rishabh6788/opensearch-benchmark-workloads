@@ -3,6 +3,16 @@
   "description": "Indexes the ClickBench dataset and runs OpenSearch PPL queries to benchmark analytical use case performance",
   "default": true,
   "schedule": [
+    {
+          "operation": {
+            "operation-type": "put-settings",
+            "body": {
+              "transient": {
+                  "plugins.ppl.syntax.legacy.preferred": "{{legacy_syntax | default(false)}}"
+              }
+            }
+          }
+    },
     {% with default_index_settings={}, index_name="clickbench" %}
     {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }},
     {% endwith %}
@@ -65,6 +75,16 @@
   "description": "Indexes the ClickBench dataset and runs OpenSearch PPL queries to benchmark analytical use case performance. Specific to the datafusion branch.",
   "default": false,
   "schedule": [
+    {
+          "operation": {
+            "operation-type": "put-settings",
+            "body": {
+              "transient": {
+                  "plugins.ppl.syntax.legacy.preferred": "{{legacy_syntax | default(false)}}"
+              }
+            }
+          }
+    },
     {% with default_index_settings={}, index_name="clickbench" %}
     {{ benchmark.collect(parts="../../common_operations/delete_index.json") }},
     {{ benchmark.collect(parts="../../common_operations/create_index.json") }},
