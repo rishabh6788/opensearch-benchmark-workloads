@@ -17,9 +17,7 @@
         "id-field-name": "{{ id_field_name }}",
         "body": {{ query_body | default ({}) | tojson }}    
     },
-    "clients": {{ search_clients | default(1)}},
-    "target-throughput": {{ target_throughput | default(10) }},
-    "time-period": {{ time_period | default(900) }}
+    "clients": {{ search_clients | default(1)}}
 },
 {
     "operation": {
@@ -40,8 +38,6 @@
         "id-field-name": "{{ id_field_name }}",
         "body": {{ query_body | default ({}) | tojson }}
     },
-    "clients": {{ search_clients | default(1)}},
-    "target-throughput": {{ target_throughput | default(10) }},
-    "time-period": {{ time_period | default(900) }}
+    "clients": {{ search_clients | default(1)}}
 }
 
