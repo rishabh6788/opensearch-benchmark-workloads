@@ -60,6 +60,22 @@
     ]
 },
 {
+    "name": "no-train-test-indexing-only-aoss-v2",
+    "description": "Index vector search which does not use an algorithm that requires training.",
+    "default": false,
+    "schedule": [
+       {{ benchmark.collect(parts="aoss/index-only-schedule.json") }}
+    ]
+},
+{
+    "name": "no-train-test-search-only-aoss-v2",
+    "description": "Index vector search which does not use an algorithm that requires training.",
+    "default": false,
+    "schedule": [
+       {{ benchmark.collect(parts="aoss/search-only-schedule-v2.json") }}
+    ]
+},
+{
     "name": "train-test",
     "description": "Index vector search that requires training.",
     "default": false,
