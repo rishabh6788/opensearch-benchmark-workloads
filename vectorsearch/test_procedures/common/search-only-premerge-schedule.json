@@ -1,11 +1,15 @@
 {
-    "name" : "warmup-indices",
+    "name" : "refresh-target-index-before-premerge-search",
+    "operation" : "refresh-target-index"
+},
+{
+    "name" : "warmup-indices-premerge",
     "operation" : "warmup-indices",
     "index": "{{ target_index_name | default('target_index') }}"
 },
 {
     "operation": {
-        "name": "prod-queries",
+        "name": "prod-queries-multisegment",
         "operation-type": "vector-search",
         "index": "{{ target_index_name | default('target_index') }}",
         "detailed-results": true,
@@ -29,8 +33,7 @@
         "id-field-name": "{{ id_field_name }}",
         "body": {{ query_body | default ({}) | tojson }},
         "filter_body": {{ filter_body | default ({}) | tojson }},
-        "filter_type": {{filter_type  | default ({}) | tojson }},
-        "repetitions": {{ number_of_repetitions | default(1)}}
+        "filter_type": {{filter_type  | default ({}) | tojson }}
     },
     "clients": {{ search_clients | default(1)}}
 }
