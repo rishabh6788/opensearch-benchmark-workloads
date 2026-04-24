@@ -8,6 +8,7 @@ class QueryParamSource:
     # noinspection PyUnusedLocal
     def __init__(self, workload, params, **kwargs):
         self._params = params
+        self._index = "sonested"
         self.infinite = True
         # here we read the queries data file into arrays which we'll then later use randomly.
         self.tags = []
@@ -48,7 +49,7 @@ class SortedTermQueryParamSource(QueryParamSource):
                     }
                 ]
             },
-            "index": None
+            "index": self._index
         }
         if "cache" in self._params:
             result["cache"] = self._params["cache"]
@@ -66,7 +67,7 @@ class TermQueryParamSource(QueryParamSource):
                     }
                 }
             },
-            "index": None
+            "index": self._index
         }
         if "cache" in self._params:
             result["cache"] = self._params["cache"]
@@ -102,7 +103,7 @@ class NestedQueryParamSource(QueryParamSource):
                     }
                 }
             },
-            "index": None
+            "index": self._index
         }
         if "cache" in self._params:
             result["cache"] = self._params["cache"]
@@ -142,7 +143,7 @@ class NestedQueryParamSourceWithInnerHits(QueryParamSource):
                 },
                 "size": self._params["size"]
             },
-            "index": None
+            "index": self._index
         }
         if "cache" in self._params:
             result["cache"] = self._params["cache"]
