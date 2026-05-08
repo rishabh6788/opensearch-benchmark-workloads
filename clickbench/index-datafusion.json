@@ -7,11 +7,9 @@
     "index.codec": "best_compression",
     "index.translog.sync_interval": "30s",
     "index.translog.durability": {{index_translog_durability | default("async") | tojson}},
-    {%- if index_optimized_enabled is defined and index_optimized_enabled %}
-    ,"index.pluggable.dataformat.enabled": true
-    ,"index.pluggable.dataformat": "composite"
-    ,"index.composite.primary_data_format": "parquet"
-    {%- endif %}
+    "index.pluggable.dataformat.enabled": true,
+    "index.pluggable.dataformat": "composite",
+    "index.composite.primary_data_format": "parquet"
   },
   "mappings": {
     "dynamic": "false",
