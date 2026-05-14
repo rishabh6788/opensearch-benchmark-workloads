@@ -5,7 +5,10 @@
     "index.refresh_interval": "{{refresh_interval | default('30s')}}",
     "index.codec": "{{codec | default('best_compression')}}",
     "index.sort.field": ["ServiceName", "Timestamp"],
-    "index.sort.order": ["asc", "asc"]
+    "index.sort.order": ["asc", "asc"],
+    "index.pluggable.dataformat.enabled": true,
+    "index.pluggable.dataformat": "composite",
+    "index.composite.primary_data_format": "parquet" 
   },
   "mappings": {
     "dynamic": false,
