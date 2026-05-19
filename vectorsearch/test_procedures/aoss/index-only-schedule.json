@@ -41,4 +41,11 @@
         "id-field-name": "{{ id_field_name }}"
     },
     "clients": {{ target_index_bulk_indexing_clients | default(1)}}
+},
+{
+          "name": "post-ingest-sleep",
+          "operation": {
+            "operation-type": "sleep",
+            "duration": {{ post_create_sleep_duration|default(120) }}
+          }
 }
