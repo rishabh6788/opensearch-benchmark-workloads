@@ -1,0 +1,70 @@
+{
+  "operation": "q11-mobile-phone-model",
+  "warmup-iterations": {{ q11_mobile_phone_model_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q11_mobile_phone_model_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q11_mobile_phone_model_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q11_mobile_phone_model_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q12-mobile-phone-stats",
+  "warmup-iterations": {{ q12_mobile_phone_stats_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q12_mobile_phone_stats_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q12_mobile_phone_stats_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q12_mobile_phone_stats_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q13-search-phrase-count",
+  "warmup-iterations": {{ q13_search_phrase_count_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q13_search_phrase_count_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q13_search_phrase_count_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q13_search_phrase_count_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q14-search-phrase-users",
+  "warmup-iterations": {{ q14_search_phrase_users_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q14_search_phrase_users_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q14_search_phrase_users_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q14_search_phrase_users_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q15-search-engine-phrase",
+  "warmup-iterations": {{ q15_search_engine_phrase_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q15_search_engine_phrase_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q15_search_engine_phrase_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q15_search_engine_phrase_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q16-user-activity",
+  "warmup-iterations": {{ q16_user_activity_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q16_user_activity_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q16_user_activity_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q16_user_activity_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q17-user-search-activity",
+  "warmup-iterations": {{ q17_user_search_activity_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q17_user_search_activity_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q17_user_search_activity_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q17_user_search_activity_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q18-user-search-limit",
+  "warmup-iterations": {{ q18_user_search_limit_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q18_user_search_limit_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q18_user_search_limit_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q18_user_search_limit_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q19-user-minute-search",
+  "warmup-iterations": {{ q19_user_minute_search_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q19_user_minute_search_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q19_user_minute_search_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q19_user_minute_search_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q20-specific-user",
+  "warmup-iterations": {{ q20_specific_user_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q20_specific_user_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q20_specific_user_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q20_specific_user_clients or search_clients | default(1) }}
+}

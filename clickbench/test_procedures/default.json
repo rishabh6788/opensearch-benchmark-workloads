@@ -167,4 +167,109 @@
           }
         }
       ]
-    }
+    },
+{
+  "name": "clickbench-bucket-1",
+  "description": "Runs ClickBench PPL queries q01-q10",
+  "default": false,
+  "schedule": [
+    {
+          "operation": {
+            "operation-type": "put-settings",
+            "body": {
+              "transient": {
+                  "plugins.ppl.syntax.legacy.preferred": "{{legacy_syntax | default("false")}}"
+              }
+            }
+          }
+    },
+    {% with default_index_settings={}, index_name="clickbench" %}
+    {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }},
+    {% endwith %}
+    {{ benchmark.collect(parts="ppl/clickbench-bucket-1-schedule.json") }}
+  ]
+},
+{
+  "name": "clickbench-bucket-2",
+  "description": "Runs ClickBench PPL queries q11-q20",
+  "default": false,
+  "schedule": [
+    {
+          "operation": {
+            "operation-type": "put-settings",
+            "body": {
+              "transient": {
+                  "plugins.ppl.syntax.legacy.preferred": "{{legacy_syntax | default("false")}}"
+              }
+            }
+          }
+    },
+    {% with default_index_settings={}, index_name="clickbench" %}
+    {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }},
+    {% endwith %}
+    {{ benchmark.collect(parts="ppl/clickbench-bucket-2-schedule.json") }}
+  ]
+},
+{
+  "name": "clickbench-bucket-3",
+  "description": "Runs ClickBench PPL queries q21-q30",
+  "default": false,
+  "schedule": [
+    {
+          "operation": {
+            "operation-type": "put-settings",
+            "body": {
+              "transient": {
+                  "plugins.ppl.syntax.legacy.preferred": "{{legacy_syntax | default("false")}}"
+              }
+            }
+          }
+    },
+    {% with default_index_settings={}, index_name="clickbench" %}
+    {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }},
+    {% endwith %}
+    {{ benchmark.collect(parts="ppl/clickbench-bucket-3-schedule.json") }}
+  ]
+},
+{
+  "name": "clickbench-bucket-4",
+  "description": "Runs ClickBench PPL queries q31-q40",
+  "default": false,
+  "schedule": [
+    {
+          "operation": {
+            "operation-type": "put-settings",
+            "body": {
+              "transient": {
+                  "plugins.ppl.syntax.legacy.preferred": "{{legacy_syntax | default("false")}}"
+              }
+            }
+          }
+    },
+    {% with default_index_settings={}, index_name="clickbench" %}
+    {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }},
+    {% endwith %}
+    {{ benchmark.collect(parts="ppl/clickbench-bucket-4-schedule.json") }}
+  ]
+},
+{
+  "name": "clickbench-bucket-5",
+  "description": "Runs ClickBench PPL queries q41-q43",
+  "default": false,
+  "schedule": [
+    {
+          "operation": {
+            "operation-type": "put-settings",
+            "body": {
+              "transient": {
+                  "plugins.ppl.syntax.legacy.preferred": "{{legacy_syntax | default("false")}}"
+              }
+            }
+          }
+    },
+    {% with default_index_settings={}, index_name="clickbench" %}
+    {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }},
+    {% endwith %}
+    {{ benchmark.collect(parts="ppl/clickbench-bucket-5-schedule.json") }}
+  ]
+}

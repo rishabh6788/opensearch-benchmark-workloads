@@ -1,0 +1,70 @@
+{
+  "operation": "q01-count-all",
+  "warmup-iterations": {{ q01_count_all_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q01_count_all_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q01_count_all_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q01_count_all_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q02-count-adv-engine",
+  "warmup-iterations": {{ q02_count_adv_engine_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q02_count_adv_engine_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q02_count_adv_engine_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q02_count_adv_engine_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q03-sum-count-avg",
+  "warmup-iterations": {{ q03_sum_count_avg_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q03_sum_count_avg_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q03_sum_count_avg_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q03_sum_count_avg_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q04-avg-userid",
+  "warmup-iterations": {{ q04_avg_userid_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q04_avg_userid_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q04_avg_userid_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q04_avg_userid_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q05-distinct-userid",
+  "warmup-iterations": {{ q05_distinct_userid_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q05_distinct_userid_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q05_distinct_userid_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q05_distinct_userid_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q06-distinct-searchphrase",
+  "warmup-iterations": {{ q06_distinct_searchphrase_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q06_distinct_searchphrase_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q06_distinct_searchphrase_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q06_distinct_searchphrase_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q07-min-max-eventdate",
+  "warmup-iterations": {{ q07_min_max_eventdate_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q07_min_max_eventdate_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q07_min_max_eventdate_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q07_min_max_eventdate_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q08-group-by-adv-engine",
+  "warmup-iterations": {{ q08_group_by_adv_engine_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q08_group_by_adv_engine_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q08_group_by_adv_engine_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q08_group_by_adv_engine_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q09-region-users",
+  "warmup-iterations": {{ q09_region_users_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q09_region_users_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q09_region_users_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q09_region_users_clients or search_clients | default(1) }}
+},
+{
+  "operation": "q10-region-stats",
+  "warmup-iterations": {{ q10_region_stats_warmup_iterations or warmup_iterations | default(100) | tojson }},
+  "iterations": {{ q10_region_stats_iterations or test_iterations | default(100) | tojson }},
+  "target-throughput": {{ q10_region_stats_target_throughput or target_throughput | default(2) | tojson }},
+  "clients": {{ q10_region_stats_clients or search_clients | default(1) }}
+}
