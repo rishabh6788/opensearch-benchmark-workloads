@@ -7,6 +7,7 @@
     {
       "name": "default",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "query": {
@@ -17,6 +18,7 @@
     {
       "name": "term",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "request-timeout": 7200,
       "body": {
@@ -32,6 +34,7 @@
     {
       "name": "range",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "query": {
@@ -47,6 +50,7 @@
     {
       "name": "range-numeric",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "query": {
@@ -62,6 +66,7 @@
     {
       "name": "keyword-in-range",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "query": {
@@ -88,6 +93,7 @@
     {
       "name": "date_histogram_hourly_agg",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "size": 0,
@@ -108,6 +114,7 @@
     {
       "name": "date_histogram_hourly_with_filter_agg",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "size": 0,
@@ -133,6 +140,7 @@
     {
       "name": "date_histogram_minute_agg",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "size": 0,
@@ -161,6 +169,7 @@
     {
       "name": "scroll",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "pages": 25,
       "results-per-page": 1000,
@@ -173,6 +182,7 @@
     {
       "name": "desc_sort_timestamp",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "query": {
@@ -186,6 +196,7 @@
     {
       "name": "desc_sort_with_after_timestamp",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "track_total_hits": false,
@@ -205,6 +216,7 @@
     {
       "name": "asc_sort_timestamp",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "query": {
@@ -218,6 +230,7 @@
     {
       "name": "asc_sort_with_after_timestamp",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "track_total_hits": false,
@@ -237,6 +250,7 @@
     {
       "name": "desc_sort_timestamp_can_match_shortcut",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "track_total_hits": false,
@@ -253,6 +267,7 @@
     {
       "name": "desc_sort_timestamp_no_can_match_shortcut",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "request-params" : {
           "pre_filter_shard_size" : 100000
@@ -272,6 +287,7 @@
     {
       "name": "asc_sort_timestamp_can_match_shortcut",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "track_total_hits": false,
@@ -288,6 +304,7 @@
     {
       "name": "asc_sort_timestamp_no_can_match_shortcut",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "request-params" : {
           "pre_filter_shard_size" : 100000
@@ -307,6 +324,7 @@
     {
       "name": "sort_keyword_can_match_shortcut",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "track_total_hits": false,
@@ -323,6 +341,7 @@
     {
       "name": "sort_keyword_no_can_match_shortcut",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "request-params" : {
           "pre_filter_shard_size" : 100000
@@ -342,6 +361,7 @@
     {
       "name": "sort_numeric_desc",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "track_total_hits": false,
@@ -358,6 +378,7 @@
     {
       "name": "sort_numeric_asc",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "track_total_hits": false,
@@ -374,6 +395,7 @@
     {
       "name": "sort_numeric_desc_with_match",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "track_total_hits": false,
@@ -392,6 +414,7 @@
     {
       "name": "sort_numeric_asc_with_match",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "track_total_hits": false,
@@ -410,6 +433,7 @@
     {
       "name": "terms-significant-1",
       "operation-type": "search",
+      "cache": false,
       "request-timeout": 7200,
       "index": "{{index_name | default('big5')}}",
       "body":
@@ -444,6 +468,7 @@
     {
       "name": "terms-significant-2",
       "operation-type": "search",
+      "cache": false,
       "request-timeout": 7200,
       "index": "{{index_name | default('big5')}}",
       "body": {
@@ -477,6 +502,7 @@
     {
       "name": "range_field_conjunction_big_range_big_term_query",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "query": {
@@ -503,6 +529,7 @@
     {
       "name": "range_field_disjunction_big_range_small_term_query",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "query": {
@@ -529,6 +556,7 @@
     {
       "name": "range_field_conjunction_small_range_small_term_query",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "query": {
@@ -555,6 +583,7 @@
     {
       "name": "range_field_conjunction_small_range_big_term_query",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "query": {
@@ -576,6 +605,7 @@
     {
       "name": "range-auto-date-histo",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "size": 0,
@@ -623,6 +653,7 @@
     {
       "name": "range-with-metrics",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "request-timeout": 7200,
       "body": {
@@ -690,6 +721,7 @@
     {
       "name": "range-auto-date-histo-with-metrics",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "request-timeout": 7200,
       "body": {
@@ -747,6 +779,7 @@
     {
       "name": "range-agg-1",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "size": 0,
@@ -786,6 +819,7 @@
     {
       "name": "range-agg-2",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "size": 0,
@@ -817,6 +851,7 @@
     {
       "name": "multi_terms-keyword",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "request-timeout": 7200,
       "body":{
@@ -848,6 +883,7 @@
     {
       "name": "composite-terms",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "size": 0,
@@ -874,6 +910,7 @@
     {
       "name": "composite_terms-keyword",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "size": 0,
@@ -901,6 +938,7 @@
     {
       "name": "composite-date_histogram-daily",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "size": 0,
@@ -930,6 +968,7 @@
     {
       "name": "keyword-terms",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "size": 0,
@@ -946,6 +985,7 @@
     {
       "name": "keyword-terms-low-cardinality",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "size": 0,
@@ -962,6 +1002,7 @@
     {
       "name": "cardinality-agg-low",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "size": 0,
@@ -977,6 +1018,7 @@
     {
       "name": "cardinality-agg-high",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "size": 0,
@@ -995,6 +1037,7 @@
     {
       "name": "cardinality-agg-high-2",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "request-timeout": 1800,
       "body": {
@@ -1012,6 +1055,7 @@
     {
       "name": "query-string-on-message",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "query": {
@@ -1024,6 +1068,7 @@
     {
       "name": "query-string-on-message-filtered",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "query": {
@@ -1050,6 +1095,7 @@
     {
       "name": "query-string-on-message-filtered-sorted-num",
       "operation-type": "search",
+      "cache": false,
       "index": "{{index_name | default('big5')}}",
       "body": {
         "query": {
@@ -1083,6 +1129,7 @@
     {
       "name": "range_with_asc_sort",
       "operation-type": "search",
+      "cache": false,
       "index": "{{ index_name | default('big5') }}",
       "body": {
         "query": {
@@ -1101,6 +1148,7 @@
     {
       "name": "range_with_desc_sort",
       "operation-type": "search",
+      "cache": false,
       "index": "{{ index_name | default('big5') }}",
       "body": {
         "query": {
