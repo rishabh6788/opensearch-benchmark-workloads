@@ -1,4 +1,11 @@
 {
+  "operation": "flush-index",
+  "warmup-iterations": {{ flush_index_warmup_iterations or warmup_iterations | default(1) | tojson }},
+  "iterations": {{ flush_index_iterations or test_iterations | default(1) | tojson }},
+  "target-throughput": {{ flush_index_target_throughput or target_throughput | default(1) | tojson }},
+  "clients": {{ flush_index_clients or search_clients | default(1) }}
+},
+{
   "operation": "q11-mobile-phone-model",
   "warmup-iterations": {{ q11_mobile_phone_model_warmup_iterations or warmup_iterations | default(100) | tojson }},
   "iterations": {{ q11_mobile_phone_model_iterations or test_iterations | default(100) | tojson }},
