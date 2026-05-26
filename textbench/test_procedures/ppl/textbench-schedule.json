@@ -1,4 +1,20 @@
 {
+  "name": "flush-index",
+  "operation-type": "raw-request",
+  "path": "/{{ index_name | default('textbench') }}/_flush",
+  "method": "POST"
+},
+{
+  "operation": {
+    "operation-type": "put-settings",
+    "body": {
+      "transient": {
+          "plugins.ppl.syntax.legacy.preferred": "{{legacy_syntax | default("false")}}"
+      }
+    }
+  }
+},
+{
   "operation": "q01-fetch-and-service-time-bounded",
   "warmup-iterations": {{ q01_warmup_iterations or warmup_iterations | default(10) | tojson }},
   "iterations": {{ q01_iterations or test_iterations | default(50) | tojson }},
