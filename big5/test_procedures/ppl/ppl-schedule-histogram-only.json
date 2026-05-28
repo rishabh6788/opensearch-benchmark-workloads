@@ -1,4 +1,14 @@
 {
+          "operation": {
+            "operation-type": "put-settings",
+            "body": {
+              "transient": {
+                  "plugins.ppl.syntax.legacy.preferred": "{{legacy_syntax | default("false")}}"
+              }
+            }
+          }
+},
+{
   "operation": "ppl-composite-date-histogram-daily",
   "warmup-iterations": {{ ppl_composite_date_histogram_daily_warmup_iterations or warmup_iterations | default(200) | tojson }},
   "iterations": {{ ppl_composite_date_histogram_daily_iterations or test_iterations | default(100) | tojson }},

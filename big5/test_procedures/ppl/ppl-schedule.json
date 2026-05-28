@@ -1,4 +1,14 @@
 {
+          "operation": {
+            "operation-type": "put-settings",
+            "body": {
+              "transient": {
+                  "plugins.ppl.syntax.legacy.preferred": "{{legacy_syntax | default("false")}}"
+              }
+            }
+          }
+},
+{
   "operation": "ppl-default",
   "warmup-iterations": {{ ppl_default_warmup_iterations or warmup_iterations | default(200) | tojson }},
   "iterations": {{ ppl_default_iterations or test_iterations | default(100) | tojson }},
