@@ -84,7 +84,8 @@
               }
               {% if analytics_oversampling | default(false) %}
               ,"persistent": {
-                  "analytics.shard_bucket_oversampling_factor": {{ analytics_oversampling_factor | default(1.5) }}
+                  "analytics.shard_bucket_oversampling_factor": {{ analytics_oversampling_factor | default(1.5) }},
+                  "cluster.pluggable.dataformat": "composite"
               }
               {% endif %}
             }
