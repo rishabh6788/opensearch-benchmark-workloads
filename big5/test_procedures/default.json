@@ -38,6 +38,7 @@
     {% endwith %}
     {% if analytics_oversampling | default(false) %}
     {
+      "name": "put-settings-analytics-oversampling",
       "operation": {
         "operation-type": "put-settings",
         "body": {
