@@ -5,6 +5,12 @@
               "transient": {
                   "plugins.ppl.syntax.legacy.preferred": "{{legacy_syntax | default("false")}}"
               }
+              {% if analytics_oversampling | default(false) %}
+              ,"persistent": {
+                  "analytics.shard_bucket_oversampling_factor": {{ analytics_oversampling_factor | default(1.5) }},
+                  "cluster.pluggable.dataformat": "composite"
+              }
+              {% endif %}
             }
           }
 },

@@ -36,20 +36,6 @@
     {% with default_index_settings={}, index_name="big5" %}
     {{ benchmark.collect(parts="../../common_operations/workload_setup.json") }},
     {% endwith %}
-    {% if analytics_oversampling | default(false) %}
-    {
-      "name": "put-settings-analytics-oversampling",
-      "operation": {
-        "operation-type": "put-settings",
-        "body": {
-          "persistent": {
-            "analytics.shard_bucket_oversampling_factor": {{ analytics_oversampling_factor | default(1.5) }},
-            "cluster.pluggable.dataformat": "composite"
-          }
-        }
-      }
-    },
-    {% endif %}
     {{ benchmark.collect(parts="ppl/ppl-schedule.json") }},
     {{ benchmark.collect(parts="ppl/ppl-schedule-histogram-only.json") }}
   ]
