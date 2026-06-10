@@ -3,11 +3,11 @@
             "operation-type": "put-settings",
             "body": {
               "transient": {
-                  "plugins.ppl.syntax.legacy.preferred": "{{legacy_syntax | default("false")}}"
+                  "plugins.ppl.syntax.legacy.preferred": {{legacy_syntax | default(false) | tojson}}
               }
-              {% if analytics_oversampling | default(false) %}
+              {% if analytics_oversampling | default(false) | tojson %}
               ,"persistent": {
-                  "analytics.shard_bucket_oversampling_factor": {{ analytics_oversampling_factor | default(1.5) }},
+                  "analytics.shard_bucket_oversampling_factor": {{ analytics_oversampling_factor | default(1.5) | tojson }},
                   "cluster.pluggable.dataformat": "composite"
               }
               {% endif %}
