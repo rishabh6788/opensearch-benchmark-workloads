@@ -5,7 +5,7 @@
               "transient": {
                   "plugins.ppl.syntax.legacy.preferred": {{legacy_syntax | default(false) | tojson}}
               }
-              {% if analytics_oversampling | default(false) | tojson %}
+              {% if analytics_oversampling | default(false) %}
               ,"persistent": {
                   "analytics.shard_bucket_oversampling_factor": {{ analytics_oversampling_factor | default(1.5) | tojson }},
                   "cluster.pluggable.dataformat": "composite"
