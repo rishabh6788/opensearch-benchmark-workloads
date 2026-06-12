@@ -82,7 +82,7 @@
               "transient": {
                   "plugins.ppl.syntax.legacy.preferred": "{{legacy_syntax | default("true")}}"
               }
-              {% if analytics_oversampling | default(false) %}
+              {% if analytics_oversampling is defined and analytics_oversampling %}
               ,"persistent": {
                   "analytics.shard_bucket_oversampling_factor": {{ analytics_oversampling_factor | default(1.5) }},
                   "cluster.pluggable.dataformat": "composite"
