@@ -90,13 +90,6 @@
   "clients": {{ q13_search_phrase_count_clients or search_clients | default(1) }}
 },
 {
-  "operation": "q14-search-phrase-users",
-  "warmup-iterations": {{ q14_search_phrase_users_warmup_iterations or warmup_iterations | default(100) | tojson }},
-  "iterations": {{ q14_search_phrase_users_iterations or test_iterations | default(100) | tojson }},
-  "target-throughput": {{ q14_search_phrase_users_target_throughput or target_throughput | default(2) | tojson }},
-  "clients": {{ q14_search_phrase_users_clients or search_clients | default(1) }}
-},
-{
   "operation": "q15-search-engine-phrase",
   "warmup-iterations": {{ q15_search_engine_phrase_warmup_iterations or warmup_iterations | default(100) | tojson }},
   "iterations": {{ q15_search_engine_phrase_iterations or test_iterations | default(100) | tojson }},
