@@ -5,8 +5,6 @@
     "index.queries.cache.enabled": {{query_cache_enabled | default(false) | tojson}},
     "index.requests.cache.enable": {{requests_cache_enabled | default(false) | tojson}},
     "index.codec": "best_compression",
-    "index.translog.sync_interval": "30s",
-    "index.translog.durability": {{index_translog_durability | default("async") | tojson}},
     "index.pluggable.dataformat.enabled": true,
     "index.pluggable.dataformat": "composite",
     "index.composite.primary_data_format": "parquet",
