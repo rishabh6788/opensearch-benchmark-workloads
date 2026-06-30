@@ -37,6 +37,7 @@
       "name": "wait-for-snapshot-recovery",
       "operation": {
         "operation-type": "wait-for-recovery",
+        "request-timeout": 3600,
         "index": "logs-*"
       }
     },
