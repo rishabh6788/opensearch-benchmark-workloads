@@ -80,7 +80,7 @@
       "target-index": "{{ target_index_name }}",
       "documents": [
         {
-          "source-file": "cohere-10m-nested-uniform.hdf5.bz2",
+          "source-file": "cohere-10m-nested-uniform.hdf5",
           "source-format": "hdf5",
           "document-count": 10550122
         }
