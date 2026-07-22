@@ -178,6 +178,66 @@
     ]
 },
 {
+    "name": "grpc-no-train-test-index-only",
+    "description": "Vector index-only via gRPC with JSON documents",
+    "default": false,
+    "schedule": [
+        {
+          "operation": {
+            "name": "delete-target-index",
+            "operation-type": "delete-index",
+            "only-if-exists": true,
+            "index": "{{ target_index_name | default('target_index') }}"
+          }
+        },
+        {
+          "operation": {
+            "name": "create-target-index",
+            "operation-type": "create-index",
+            "index": "{{ target_index_name | default('target_index') }}"
+          }
+        },
+        {
+          "operation": "grpc-vector-bulk",
+          "clients": {{ target_index_bulk_indexing_clients | default(1)}}
+        },
+        {
+          "name": "refresh-target-index",
+          "operation": "refresh-target-index"
+        }
+    ]
+},
+{
+    "name": "grpc-cbor-no-train-test-index-only",
+    "description": "Vector index-only via gRPC with CBOR documents",
+    "default": false,
+    "schedule": [
+        {
+          "operation": {
+            "name": "delete-target-index",
+            "operation-type": "delete-index",
+            "only-if-exists": true,
+            "index": "{{ target_index_name | default('target_index') }}"
+          }
+        },
+        {
+          "operation": {
+            "name": "create-target-index",
+            "operation-type": "create-index",
+            "index": "{{ target_index_name | default('target_index') }}"
+          }
+        },
+        {
+          "operation": "grpc-cbor-vector-bulk",
+          "clients": {{ target_index_bulk_indexing_clients | default(1)}}
+        },
+        {
+          "name": "refresh-target-index",
+          "operation": "refresh-target-index"
+        }
+    ]
+},
+{
   "name": "restore-from-snapshot",
   "description": "Index vector search which does not use an algorithm that requires training.",
   "default": false,

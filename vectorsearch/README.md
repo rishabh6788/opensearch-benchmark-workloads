@@ -49,6 +49,10 @@ You can define the underlying configuration of the vector search algorithm like 
 method definition . Check [vector search method definitions]([https://opensearch.org/docs/latest/search-plugins/knn/knn-index/#method-definitions)
 for more details.
 
+### gRPC No Train Test
+
+The No Train Test procedure with search components executed with gRPC/protobuf over the `transport-grpc` plugin. To utilize this procedure ensure the `transport-grpc` plugin is [installed and enabled](https://github.com/opensearch-project/OpenSearch/tree/main/modules/transport-grpc#readme) on your cluster. Specify the this procedure with `--test-procedure="grpc-no-train-test"`, and provide the gRPC transport endpoint with `--grpc-target-hosts=<host:port>`.
+
 ### No Train Test Index Only
 This procedure is used to index only vector search index which requires no training. This will be useful if
 you are interested in benchmarking only indexing operation.
@@ -106,6 +110,13 @@ This workload allows the following parameters to be specified using `--workload-
 | target_throughput                       | Target throughput for each query operation in requests per second (default 10)                                                       |
 | time_period                             | The period of time dedicated for the benchmark execution in seconds (default 900)                                                    |
 | derived_source_enabled                  | Whether or not derived source feature should be enabled on the index (default null, pass in either true or false)                    |
+| remote_index_build_enabled              | Whether or not remote index build feature should be enabled on the index (default false, pass in either true or false)               |
+| remote_index_build_size_threshold       | If remote_index_build_enabled, indicates the size threshold above which remote vector builds will be enabled (default 50mb)          |
+| memory_optimized_search_enabled         | Whether to enable memory optimized search on the index. (default false, pass in either true or fals)                                 |
+| knn_prefetch_enabled                    | Enable disable the prefetch based on the value. (default is false)                                                                   |
+| mode                                    | Vector workload index mode. Set to `on_disk` to enable disk-based features like rescoring with `oversample_factor`. |
+| compression_level                       | Compression level for disk-based vector indices. Use with `mode=on_disk`. |
+| oversample_factor                       | Oversample factor for rescoring in disk-based vector search. Retrieves (k × oversample_factor) candidates and rescores to return top k results. Higher values typically improve recall but may affect latency; optimal value depends on dataset characteristics. Applicable only when `mode=on_disk`. |
 
 
 
@@ -644,3 +655,210 @@ Currently, there is only one custom runner defined in [runners.py](runners.py).
 | Syntax             | Description                                         | Parameters                                                                                                   |
 |--------------------|-----------------------------------------------------|:-------------------------------------------------------------------------------------------------------------|
 | warmup-knn-indices | Warm up knn indices with retry until success.       | 1. index - name of index to warmup                                                                           |
+
+### Running a Random Dataset benchmark
+
+The vectorsearch workload supports generating vectors for benchmarking without requiring external datasets. This is useful for quick performance testing and development.
+
+#### Vector Generation
+
+Vectors are generated using `sklearn.datasets.make_blobs` which produces Gaussian clustered data rather than 
+uniform random vectors. This is important because:
+
+- **Uniform random vectors** are approximately equidistant in high-dimensional space, creating no natural 
+  neighborhoods. This results in worst-case behavior for graph-based ANN algorithms (like HNSW) and produces 
+  recall/latency numbers that are not representative of real-world workloads.
+- **Clustered vectors (make_blobs)** have realistic neighborhood structure similar to real embeddings (text, image), 
+  allowing HNSW to build efficient navigable graphs and producing meaningful benchmark results.
+
+Cluster centers are generated once with a fixed seed and shared across all parallel indexing clients, ensuring 
+consistent global cluster structure regardless of the number of processes.
+
+Default configuration:
+- `num_centers=2000` — With ~800K-1.5M docs per segment, this gives 400-750 vectors per cluster per segment, 
+  well above HNSW's M parameter for strong intra-cluster connectivity.
+- `cluster_std=0.5` — Controls the spread of points around each center. At 0.5, clusters have clear structure 
+  with slight overlap at boundaries, producing realistic transitions between neighborhoods without creating 
+  overly isolated islands that could degrade cross-cluster search.
+
+#### Available Test Procedures
+
+- `random-vector-index-only` - Index random vectors only
+- `random-vector-index-with-merge-only` - Index random vectors and force merge
+- `random-vector-search-only` - Search with random query vectors (requires pre-indexed data)
+- `random-vector-index-merge-search` - Complete workflow: index, merge, and search
+
+#### Ingestion
+Ingestion can be done in 2 modes  depending on whether `index_target_throughput` is specified or not. The workload 
+launches `indexing_clients` parallel clients. Each client sends `index_iterations` bulk requests, with each request 
+containing `target_index_bulk_size` documents.
+The total number of documents indexed is: `indexing_clients × index_iterations × target_index_bulk_size`
+
+1. If `index_target_throughput` is set, each client will send bulk operations at a rate of: `index_target_throughput ÷ 
+indexing_clients` bulk requests per second.
+2. If `index_target_throughput` is not set, each client will send bulk operations as fast as possible.
+
+#### Search
+The current random workload only do Approximate Nearest Neighbor search using `knn` query. The total number of 
+queries that will run will be `search_clients x query_iterations`. You can specify `warmup_search_iterations` to run 
+some warmup queries which will not be included in final results. 
+
+#### Example Command
+
+```bash
+# OpenSearch Cluster End point url with hostname and port
+export ENDPOINT=  
+# Absolute file path of Workload param file
+export PARAMS_FILE=
+
+opensearch-benchmark execute-test \
+    --target-hosts $ENDPOINT \
+    --workload vectorsearch \
+    --test-procedure=random-vector-index-only \
+    --workload-params ${PARAMS_FILE} \
+    --pipeline benchmark-only \
+    --kill-running-processes
+```
+
+#### Key Parameters
+
+You can customize the benchmark by modifying parameters in your workload-params file:
+
+The default values here will ingest 1M docs of 768D and will run 1K queries using 10 clients
+
+```json
+{
+    "target_index_name": "target_index",
+    "target_field_name": "target_field",
+    "target_index_body": "indices/faiss-index.json",
+    "target_index_primary_shards": 3,
+    "target_index_replica_shards": 0,
+    "target_index_dimension": 768,
+    "target_index_space_type": "innerproduct",
+    
+    "target_index_bulk_size": 100,
+    "indexing_clients": 10,
+    "index_iterations": 1000,
+    
+    "target_index_max_num_segments": 1,
+    "hnsw_ef_search": 100,
+    "hnsw_ef_construction": 100,
+
+    "num_centers": 2000,
+    "cluster_std": 0.5,
+
+    "query_k": 100,
+    "query_body": {
+         "docvalue_fields" : ["_id"],
+         "stored_fields" : "_none_"
+    },
+    "query_iterations": 100,
+    "search_clients": 10
+}
+
+```
+
+- `target_index_dimension` - Vector dimension size
+- `target_index_bulk_size` - Number of documents per bulk request
+- `target_index_bulk_indexing_clients` - Number of concurrent indexing clients
+- `index_iterations` - Number of indexing iterations
+- `num_centers` - Number of Gaussian cluster centers for vector generation (default: 2000). Choose based on total docs per segment to ensure sufficient vectors per cluster (aim for >> M parameter of HNSW)
+- `cluster_std` - Standard deviation of points around cluster centers (default: 0.5). Lower values = tighter, more separated clusters. Higher values = more overlap (approaches uniform random above ~5.0)
+- `query_k` - Number of nearest neighbors to retrieve
+- `query_iterations` - Number of search queries to execute
+- `search_clients` - Number of clients that will executing the 
+
+#### Sample Response
+```
+opensearch-benchmark run --target-host=$ENDPOINT \
+--workload-path=<PATH>/opensearch-benchmark-workloads/vectorsearch \
+--pipeline benchmark-only --workload-params $PARAMS \
+--test-procedure=random-vector-index-merge-search --kill-running-processes
+
+```
+
+```
+------------------------------------------------------
+    _______             __   _____
+   / ____(_)___  ____ _/ /  / ___/_________  ________
+  / /_  / / __ \/ __ `/ /   \__ \/ ___/ __ \/ ___/ _ \
+ / __/ / / / / / /_/ / /   ___/ / /__/ /_/ / /  /  __/
+/_/   /_/_/ /_/\__,_/_/   /____/\___/\____/_/   \___/
+------------------------------------------------------
+            
+|                                                         Metric |                   Task |       Value |   Unit |
+|---------------------------------------------------------------:|-----------------------:|------------:|-------:|
+|                     Cumulative indexing time of primary shards |                        |    0.374433 |    min |
+|             Min cumulative indexing time across primary shards |                        | 0.000233333 |    min |
+|          Median cumulative indexing time across primary shards |                        |    0.118133 |    min |
+|             Max cumulative indexing time across primary shards |                        |    0.137933 |    min |
+|            Cumulative indexing throttle time of primary shards |                        |           0 |    min |
+|    Min cumulative indexing throttle time across primary shards |                        |           0 |    min |
+| Median cumulative indexing throttle time across primary shards |                        |           0 |    min |
+|    Max cumulative indexing throttle time across primary shards |                        |           0 |    min |
+|                        Cumulative merge time of primary shards |                        |     0.01005 |    min |
+|                       Cumulative merge count of primary shards |                        |           3 |        |
+|                Min cumulative merge time across primary shards |                        |           0 |    min |
+|             Median cumulative merge time across primary shards |                        |  0.00328333 |    min |
+|                Max cumulative merge time across primary shards |                        |  0.00348333 |    min |
+|               Cumulative merge throttle time of primary shards |                        |           0 |    min |
+|       Min cumulative merge throttle time across primary shards |                        |           0 |    min |
+|    Median cumulative merge throttle time across primary shards |                        |           0 |    min |
+|       Max cumulative merge throttle time across primary shards |                        |           0 |    min |
+|                      Cumulative refresh time of primary shards |                        |   0.0324667 |    min |
+|                     Cumulative refresh count of primary shards |                        |          43 |        |
+|              Min cumulative refresh time across primary shards |                        |  0.00133333 |    min |
+|           Median cumulative refresh time across primary shards |                        |  0.00763333 |    min |
+|              Max cumulative refresh time across primary shards |                        |   0.0158667 |    min |
+|                        Cumulative flush time of primary shards |                        |      0.0024 |    min |
+|                       Cumulative flush count of primary shards |                        |           2 |        |
+|                Min cumulative flush time across primary shards |                        |           0 |    min |
+|             Median cumulative flush time across primary shards |                        |           0 |    min |
+|                Max cumulative flush time across primary shards |                        |      0.0024 |    min |
+|                                        Total Young Gen GC time |                        |       0.072 |      s |
+|                                       Total Young Gen GC count |                        |          15 |        |
+|                                          Total Old Gen GC time |                        |           0 |      s |
+|                                         Total Old Gen GC count |                        |           0 |        |
+|                                                     Store size |                        |   0.0290672 |     GB |
+|                                                  Translog size |                        | 6.78934e-07 |     GB |
+|                                         Heap used for segments |                        |           0 |     MB |
+|                                       Heap used for doc values |                        |           0 |     MB |
+|                                            Heap used for terms |                        |           0 |     MB |
+|                                            Heap used for norms |                        |           0 |     MB |
+|                                           Heap used for points |                        |           0 |     MB |
+|                                    Heap used for stored fields |                        |           0 |     MB |
+|                                                  Segment count |                        |           5 |        |
+|                                                 Min Throughput | random-vector-indexing |     2396.96 | docs/s |
+|                                                Mean Throughput | random-vector-indexing |     2983.55 | docs/s |
+|                                              Median Throughput | random-vector-indexing |     2983.55 | docs/s |
+|                                                 Max Throughput | random-vector-indexing |     3570.14 | docs/s |
+|                                        50th percentile latency | random-vector-indexing |     170.128 |     ms |
+|                                        90th percentile latency | random-vector-indexing |     288.014 |     ms |
+|                                        99th percentile latency | random-vector-indexing |     507.421 |     ms |
+|                                       100th percentile latency | random-vector-indexing |     567.818 |     ms |
+|                                   50th percentile service time | random-vector-indexing |     170.128 |     ms |
+|                                   90th percentile service time | random-vector-indexing |     288.014 |     ms |
+|                                   99th percentile service time | random-vector-indexing |     507.421 |     ms |
+|                                  100th percentile service time | random-vector-indexing |     567.818 |     ms |
+|                                                     error rate | random-vector-indexing |           0 |      % |
+|                                                 Min Throughput |   random-vector-search |     1976.22 |  ops/s |
+|                                                Mean Throughput |   random-vector-search |     1976.22 |  ops/s |
+|                                              Median Throughput |   random-vector-search |     1976.22 |  ops/s |
+|                                                 Max Throughput |   random-vector-search |     1976.22 |  ops/s |
+|                                        50th percentile latency |   random-vector-search |     2.90242 |     ms |
+|                                        90th percentile latency |   random-vector-search |     4.33686 |     ms |
+|                                        99th percentile latency |   random-vector-search |     18.2361 |     ms |
+|                                      99.9th percentile latency |   random-vector-search |     59.4897 |     ms |
+|                                       100th percentile latency |   random-vector-search |     60.4879 |     ms |
+|                                   50th percentile service time |   random-vector-search |     2.90242 |     ms |
+|                                   90th percentile service time |   random-vector-search |     4.33686 |     ms |
+|                                   99th percentile service time |   random-vector-search |     18.2361 |     ms |
+|                                 99.9th percentile service time |   random-vector-search |     59.4897 |     ms |
+|                                  100th percentile service time |   random-vector-search |     60.4879 |     ms |
+|                                                     error rate |   random-vector-search |           0 |      % |
+
+
+----------------------------------
+[INFO] ✅ SUCCESS (took 70 seconds)
+----------------------------------
+```
