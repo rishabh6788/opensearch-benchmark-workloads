@@ -1,0 +1,90 @@
+{
+  "name":"multi-cluster",
+  "default": false,
+  "schedule": [
+    {
+      "operation": {
+        "name": "delete-index-default",
+        "operation-type": "cluster-aware-delete-index",
+        "param-source": "cluster-aware-delete-index-source",
+        "cluster": "default"
+      }
+    },
+    {
+      "operation": {
+        "name": "create-index-default",
+        "operation-type": "cluster-aware-create-index",
+        "param-source": "cluster-aware-create-index-source",
+        "cluster": "default"
+      }
+    },
+    {
+      "operation": {
+        "name": "bulk-default",
+        "operation-type": "cluster-aware-bulk",
+        "param-source": "cluster-aware-bulk-source",
+        "cluster": "default",
+        "bulk-size": {{bulk_size | default(5000)}}
+      },
+      "clients": {{bulk_indexing_clients | default(8)}}
+    },
+    {
+      "operation": {
+        "operation-type": "sleep",
+        "duration": 120
+      }
+    },
+    {
+      "operation": {
+        "operation-type": "refresh",
+        "index": "big5*" 
+      }
+    },
+    {
+      "operation": {
+        "operation-type": "cluster-aware-switchover-seal",
+        "cluster": "default",
+        "relationship": "my-relationship",
+        "epoch": 1
+      }
+    },
+    {
+      "operation": {
+        "name": "delete-index-other",
+        "operation-type": "cluster-aware-delete-index",
+        "param-source": "cluster-aware-delete-index-source",
+        "cluster": "follower"
+      }
+    },
+    {
+      "operation": {
+        "name": "create-index-other",
+        "operation-type": "cluster-aware-create-index",
+        "param-source": "cluster-aware-create-index-source",
+        "cluster": "follower"
+      }
+    },
+    {
+      "operation": {
+        "name": "bulk-other",
+        "operation-type": "cluster-aware-bulk",
+        "param-source": "cluster-aware-bulk-source",
+        "cluster": "follower",
+        "bulk-size": {{bulk_size | default(5000)}}
+      },
+      "clients": {{bulk_indexing_clients | default(8)}}
+    },
+    {
+      "operation": {
+        "operation-type": "sleep",
+        "duration": 120
+      }
+    },
+    {
+      "operation": {
+        "operation-type": "refresh",
+        "index": "big5*" 
+      }
+    }
+  ]
+}
