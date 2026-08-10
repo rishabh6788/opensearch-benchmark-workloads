@@ -1,12 +1,15 @@
 import random
 from .runners import register as register_runners
-from osbenchmark.worker_coordinator.runner import BulkIndex, CreateIndex, DeleteIndex
+from osbenchmark.worker_coordinator.runner import BulkIndex, CreateIndex, DeleteIndex, Runner, request_context_holder
 from osbenchmark.workload.params import (
     BulkIndexParamSource,
     CreateIndexParamSource,
     DeleteIndexParamSource,
 )
 
+#from osbenchmark.client import RequestContextHolder
+
+#request_context_holder = RequestContextHolder()
 
 class RandomProcessNameParamSource:
     def __init__(self, workload, params, **kwargs):
@@ -14,10 +17,10 @@ class RandomProcessNameParamSource:
         self.infinite = True
         self.process_names = ["udev", "systemd", "sshd", "kernel", "journal", "httpd", "cron"]
         random.seed(42)
-    
+
     def partition(self, partition_index, total_partitions):
         return self
-    
+
     def params(self):
         return {
             "process_name": random.choice(self.process_names)
@@ -63,12 +66,17 @@ class ClusterAwareSwitchoverSeal(Runner):
 
         client = opensearch[cluster]
         path = "/_remote_replication/cluster/{}/switchover/_seal".format(relationship)
+        request_context_holder.on_client_request_start()
+
         await client.transport.perform_request(
             "POST",
             path,
             body={"epoch": epoch},
-            headers={"Content-Type: application/json"}
+            headers={"Content-Type": "application/json"}
             )
+
+        request_context_holder.on_client_request_end()
+
         return 1, "ops"
 
     def __repr__(self, *args, **kwargs):
