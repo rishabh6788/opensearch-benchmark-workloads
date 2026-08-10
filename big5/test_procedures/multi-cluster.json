@@ -73,18 +73,6 @@
         "bulk-size": {{bulk_size | default(5000)}}
       },
       "clients": {{bulk_indexing_clients | default(8)}}
-    },
-    {
-      "operation": {
-        "operation-type": "sleep",
-        "duration": 120
-      }
-    },
-    {
-      "operation": {
-        "operation-type": "refresh",
-        "index": "big5*" 
-      }
     }
   ]
 }
