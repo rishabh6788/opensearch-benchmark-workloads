@@ -1,0 +1,61 @@
+{
+  "name": "bulk-refresh-delete-sleep",
+  "description": "Recreate the index, bulk index, refresh, delete-by-query over a time range, then a 2 minute pause",
+  "schedule": [
+    {
+      "name": "delete-index-if-exists",
+      "operation": {
+        "operation-type": "delete-index",
+        "index": "big5",
+        "only-if-exists": true
+      }
+    },
+    {
+      "name": "create-index",
+      "operation": {
+        "operation-type": "create-index"
+      }
+    },
+    {
+      "operation": {
+        "operation-type": "bulk",
+        "bulk-size": 5000,
+        "ingest-percentage": 100
+      },
+      "warmup-time-period": 60,
+      "clients": 8
+    },
+    {
+      "name": "refresh-after-bulk",
+      "operation": {
+        "operation-type": "refresh"
+      }
+    },
+    {
+      "name": "delete-by-query-time-range",
+      "operation": {
+        "operation-type": "raw-request",
+        "method": "POST",
+        "request-timeout": 1800,
+        "path": "/big5/_delete_by_query",
+        "body": {
+          "query": {
+            "range": {
+              "@timestamp": {
+                "gte": {{ terms_significant_1_gte or gte | default("2023-01-01T00:00:00") | tojson }},
+                "lt": {{ terms_significant_1_lt or lt | default("2023-01-03T00:00:00") | tojson }}
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "settle-2min",
+      "operation": {
+        "operation-type": "sleep",
+        "duration": 120
+      }
+    }
+  ]
+}
