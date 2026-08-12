@@ -49,19 +49,10 @@
       }
     },
     {
-      "operation": {
-        "name": "delete-index-other",
-        "operation-type": "cluster-aware-delete-index",
-        "param-source": "cluster-aware-delete-index-source",
-        "cluster": "follower"
-      }
-    },
-    {
-      "operation": {
-        "name": "create-index-other",
-        "operation-type": "cluster-aware-create-index",
-        "param-source": "cluster-aware-create-index-source",
-        "cluster": "follower"
+      "name": "wait-for-switchover",
+      "operation":{
+        "operation-type": "sleep",
+        "duration": 30
       }
     },
     {
