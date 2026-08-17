@@ -64,6 +64,13 @@
         "bulk-size": {{bulk_size | default(5000)}}
       },
       "clients": {{bulk_indexing_clients | default(8)}}
+    },
+    {
+      "name": "sleep-after-ingestion",
+      "operation":{
+        "operation-type": "sleep",
+        "duration": 30
+      }
     }
   ]
 }
