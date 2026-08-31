@@ -71,6 +71,17 @@
   ]
 },
 {
+  "name": "streaming-agg-clickbench",
+  "description": "Prepares the ClickBench dataset and runs streaming-eligible DSL aggregation queries.",
+  "default": false,
+  "schedule": [
+    {% with default_index_settings={}, index_name="clickbench" %}
+    {{ benchmark.collect(parts="common/streaming-agg-workload-setup.json") }},
+    {% endwith %}
+    {{ benchmark.collect(parts="dsl/streaming-agg-clickbench-schedule.json") }}
+  ]
+},
+{
   "name": "datafusion-ppl",
   "description": "Indexes the ClickBench dataset and runs OpenSearch PPL queries to benchmark analytical use case performance. Specific to the datafusion branch.",
   "default": false,
