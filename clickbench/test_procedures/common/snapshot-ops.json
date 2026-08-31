@@ -5,7 +5,7 @@
 "name": "register-snapshot-repository",
 "operation": {
 "operation-type": "create-snapshot-repository",
-"repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
+"repository": {{ snapshot_repo | default(snapshot_repo_name) | default('test-snapshot-repo') | tojson }},
 "body": {
 "type": "s3",
 "settings": {
@@ -20,7 +20,7 @@
 "name": "restore-from-snapshot",
 "operation": {
 "operation-type": "restore-snapshot",
-"repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
+"repository": {{ snapshot_repo | default(snapshot_repo_name) | default('test-snapshot-repo') | tojson }},
 "snapshot": {{ snapshot_name | default('test-snapshot') | tojson }},
 "body": {
 "index_settings": {
