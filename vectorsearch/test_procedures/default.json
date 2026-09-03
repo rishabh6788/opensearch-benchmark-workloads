@@ -238,6 +238,24 @@
     ]
 },
 {
+    "name": "filter-percentage-sweep",
+    "default": false,
+    "description": "Index once, then run radial filtered search at each percentage in filter_percentages.",
+    "schedule": [
+       {{ benchmark.collect(parts="common/index-only-schedule.json") }},
+       {{ benchmark.collect(parts="common/force-merge-schedule.json") }},
+       {{ benchmark.collect(parts="common/filter-percentage-sweep-schedule.json") }}
+    ]
+},
+{
+    "name": "filter-percentage-sweep-search-only",
+    "default": false,
+    "description": "Radial filtered search at each percentage in filter_percentages on a previously indexed cluster.",
+    "schedule": [
+       {{ benchmark.collect(parts="common/filter-percentage-sweep-schedule.json") }}
+    ]
+},
+{
   "name": "restore-from-snapshot",
   "description": "Index vector search which does not use an algorithm that requires training.",
   "default": false,
