@@ -1,0 +1,360 @@
+    {
+      "name": "index-append",
+      "operation-type": "bulk",
+      "bulk-size": {{bulk_size | default(500)}},
+      "ingest-percentage": {{ingest_percentage | default(100)}}
+    },
+    {
+      "name": "default",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "query": {
+          "match_all": {}
+        }
+      }
+    },
+    {
+      "name": "q0-trace-id",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 0,
+        "track_total_hits": true,
+        "query": {
+          "bool": {
+            "filter": [
+              { "term": { "trace_id": "{{ trace_id | default('299cb1bc60705f72a45c7d9f70a82156') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "q0-trace-id-rows",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 100,
+        "query": {
+          "bool": {
+            "filter": [
+              { "term": { "trace_id": "{{ trace_id | default('299cb1bc60705f72a45c7d9f70a82156') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        },
+        "sort": [ { "_timestamp": "desc" } ]
+      }
+    },
+    {
+      "name": "q1-span-id",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 0,
+        "track_total_hits": true,
+        "query": {
+          "bool": {
+            "filter": [
+              { "term": { "span_id": "{{ span_id | default('7a4e90080fd2a013') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "q1-span-id-rows",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 100,
+        "query": {
+          "bool": {
+            "filter": [
+              { "term": { "span_id": "{{ span_id | default('7a4e90080fd2a013') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        },
+        "sort": [ { "_timestamp": "desc" } ]
+      }
+    },
+    {
+      "name": "q2-rare-token",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 0,
+        "track_total_hits": true,
+        "query": {
+          "bool": {
+            "filter": [
+              { "match": { "message": "{{ rare_token | default('474dbfe4c65a971176ae239869a6ba47') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "q2-rare-token-rows",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 100,
+        "query": {
+          "bool": {
+            "filter": [
+              { "match": { "message": "{{ rare_token | default('474dbfe4c65a971176ae239869a6ba47') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        },
+        "sort": [ { "_timestamp": "desc" } ]
+      }
+    },
+    {
+      "name": "q3-common-token",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 0,
+        "track_total_hits": true,
+        "query": {
+          "bool": {
+            "filter": [
+              { "match": { "message": "{{ common_token | default('failed') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "q3-common-token-rows",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 100,
+        "query": {
+          "bool": {
+            "filter": [
+              { "match": { "message": "{{ common_token | default('failed') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        },
+        "sort": [ { "_timestamp": "desc" } ]
+      }
+    },
+    {
+      "name": "q4-container-and-trace-id",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 0,
+        "track_total_hits": true,
+        "query": {
+          "bool": {
+            "filter": [
+              { "term": { "kubernetes_container_name": "{{ container_name | default('api-gateway-container') }}" } },
+              { "term": { "trace_id": "{{ trace_id | default('299cb1bc60705f72a45c7d9f70a82156') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "q4-container-and-trace-id-rows",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 100,
+        "query": {
+          "bool": {
+            "filter": [
+              { "term": { "kubernetes_container_name": "{{ container_name | default('api-gateway-container') }}" } },
+              { "term": { "trace_id": "{{ trace_id | default('299cb1bc60705f72a45c7d9f70a82156') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        },
+        "sort": [ { "_timestamp": "desc" } ]
+      }
+    },
+    {
+      "name": "q5-container-and-token",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 0,
+        "track_total_hits": true,
+        "query": {
+          "bool": {
+            "filter": [
+              { "term": { "kubernetes_container_name": "{{ container_name | default('api-gateway-container') }}" } },
+              { "match": { "message": "{{ rare_token | default('474dbfe4c65a971176ae239869a6ba47') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "q5-container-and-token-rows",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 100,
+        "query": {
+          "bool": {
+            "filter": [
+              { "term": { "kubernetes_container_name": "{{ container_name | default('api-gateway-container') }}" } },
+              { "match": { "message": "{{ rare_token | default('474dbfe4c65a971176ae239869a6ba47') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        },
+        "sort": [ { "_timestamp": "desc" } ]
+      }
+    },
+    {
+      "name": "q6-double-token",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 0,
+        "track_total_hits": true,
+        "query": {
+          "bool": {
+            "filter": [
+              { "match": { "message": "{{ common_token | default('failed') }}" } },
+              { "match": { "message": "{{ rare_token | default('474dbfe4c65a971176ae239869a6ba47') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "q6-double-token-rows",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 100,
+        "query": {
+          "bool": {
+            "filter": [
+              { "match": { "message": "{{ common_token | default('failed') }}" } },
+              { "match": { "message": "{{ rare_token | default('474dbfe4c65a971176ae239869a6ba47') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        },
+        "sort": [ { "_timestamp": "desc" } ]
+      }
+    },
+    {
+      "name": "q7-pod-name",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 0,
+        "track_total_hits": true,
+        "query": {
+          "bool": {
+            "filter": [
+              { "term": { "kubernetes_pod_name": "{{ pod_name | default('api-gateway-9a2c1e6f4-8923f') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "q7-pod-name-rows",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "body": {
+        "size": 100,
+        "query": {
+          "bool": {
+            "filter": [
+              { "term": { "kubernetes_pod_name": "{{ pod_name | default('api-gateway-9a2c1e6f4-8923f') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        },
+        "sort": [ { "_timestamp": "desc" } ]
+      }
+    },
+    {
+      "name": "q8-histogram-1h",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "request-timeout": 7200,
+      "body": {
+        "size": 0,
+        "query": {
+          "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } }
+        },
+        "aggs": {
+          "events_over_time": {
+            "histogram": {
+              "field": "_timestamp",
+              "interval": {{ histogram_interval_us | default(3600000000) }}
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "q9-top-namespaces",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "request-timeout": 7200,
+      "body": {
+        "size": 0,
+        "query": {
+          "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } }
+        },
+        "aggs": {
+          "top_namespaces": {
+            "terms": {
+              "field": "kubernetes_namespace_name",
+              "size": 10,
+              "order": { "_count": "desc" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "q10-filtered-histogram-1h",
+      "operation-type": "search",
+      "index": "{{index_name | default('k8s_logs')}}",
+      "request-timeout": 7200,
+      "body": {
+        "size": 0,
+        "query": {
+          "bool": {
+            "filter": [
+              { "match": { "message": "{{ common_token | default('failed') }}" } },
+              { "range": { "_timestamp": { "gte": {{ ts_gte | default(1780272000000000) }}, "lte": {{ ts_lte | default(1811808000000000) }} } } }
+            ]
+          }
+        },
+        "aggs": {
+          "events_over_time": {
+            "histogram": {
+              "field": "_timestamp",
+              "interval": {{ histogram_interval_us | default(3600000000) }}
+            }
+          }
+        }
+      }
+    }

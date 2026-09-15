@@ -1,0 +1,87 @@
+{
+  "operation": {
+    "operation-type": "put-settings",
+    "body": {
+      "transient": {
+        "plugins.ppl.syntax.legacy.preferred": {{legacy_syntax | default(false) | tojson}}
+      }
+    }
+  }
+},
+{
+  "operation": "ppl-q0-trace-id",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q1-span-id",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q2-rare-token",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q3-common-token",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q4-container-and-trace-id",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q5-container-and-token",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q6-double-token",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q7-pod-name",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q8-histogram-1h",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q9-top-namespaces",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q10-filtered-histogram-1h",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+}

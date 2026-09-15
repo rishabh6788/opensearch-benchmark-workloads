@@ -1,0 +1,99 @@
+    {
+      "name": "ppl-q0-trace-id",
+      "operation-type": "raw-request",
+      "path": "/_plugins/_ppl",
+      "method": "POST",
+      "body": {
+        "query": "source = {{index_name | default('k8s_logs')}} | where `trace_id` = '{{ trace_id | default('299cb1bc60705f72a45c7d9f70a82156') }}' and `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | stats count()"
+      }
+    },
+    {
+      "name": "ppl-q1-span-id",
+      "operation-type": "raw-request",
+      "path": "/_plugins/_ppl",
+      "method": "POST",
+      "body": {
+        "query": "source = {{index_name | default('k8s_logs')}} | where `span_id` = '{{ span_id | default('7a4e90080fd2a013') }}' and `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | stats count()"
+      }
+    },
+    {
+      "name": "ppl-q2-rare-token",
+      "operation-type": "raw-request",
+      "path": "/_plugins/_ppl",
+      "method": "POST",
+      "body": {
+        "query": "source = {{index_name | default('k8s_logs')}} | where match(`message`, '{{ rare_token | default('474dbfe4c65a971176ae239869a6ba47') }}') and `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | stats count()"
+      }
+    },
+    {
+      "name": "ppl-q3-common-token",
+      "operation-type": "raw-request",
+      "path": "/_plugins/_ppl",
+      "method": "POST",
+      "body": {
+        "query": "source = {{index_name | default('k8s_logs')}} | where match(`message`, '{{ common_token | default('failed') }}') and `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | stats count()"
+      }
+    },
+    {
+      "name": "ppl-q4-container-and-trace-id",
+      "operation-type": "raw-request",
+      "path": "/_plugins/_ppl",
+      "method": "POST",
+      "body": {
+        "query": "source = {{index_name | default('k8s_logs')}} | where `kubernetes_container_name` = '{{ container_name | default('api-gateway-container') }}' and `trace_id` = '{{ trace_id | default('299cb1bc60705f72a45c7d9f70a82156') }}' and `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | stats count()"
+      }
+    },
+    {
+      "name": "ppl-q5-container-and-token",
+      "operation-type": "raw-request",
+      "path": "/_plugins/_ppl",
+      "method": "POST",
+      "body": {
+        "query": "source = {{index_name | default('k8s_logs')}} | where `kubernetes_container_name` = '{{ container_name | default('api-gateway-container') }}' and match(`message`, '{{ rare_token | default('474dbfe4c65a971176ae239869a6ba47') }}') and `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | stats count()"
+      }
+    },
+    {
+      "name": "ppl-q6-double-token",
+      "operation-type": "raw-request",
+      "path": "/_plugins/_ppl",
+      "method": "POST",
+      "body": {
+        "query": "source = {{index_name | default('k8s_logs')}} | where match(`message`, '{{ common_token | default('failed') }}') and match(`message`, '{{ rare_token | default('474dbfe4c65a971176ae239869a6ba47') }}') and `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | stats count()"
+      }
+    },
+    {
+      "name": "ppl-q7-pod-name",
+      "operation-type": "raw-request",
+      "path": "/_plugins/_ppl",
+      "method": "POST",
+      "body": {
+        "query": "source = {{index_name | default('k8s_logs')}} | where `kubernetes_pod_name` = '{{ pod_name | default('api-gateway-9a2c1e6f4-8923f') }}' and `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | stats count()"
+      }
+    },
+    {
+      "name": "ppl-q8-histogram-1h",
+      "operation-type": "raw-request",
+      "path": "/_plugins/_ppl",
+      "method": "POST",
+      "body": {
+        "query": "source = {{index_name | default('k8s_logs')}} | where `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | stats count() by span(`_timestamp`, {{ histogram_interval_us | default(3600000000) }}) as ts | sort ts"
+      }
+    },
+    {
+      "name": "ppl-q9-top-namespaces",
+      "operation-type": "raw-request",
+      "path": "/_plugins/_ppl",
+      "method": "POST",
+      "body": {
+        "query": "source = {{index_name | default('k8s_logs')}} | where `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | stats {% if distribution_version.split('.') | map('int') | list >= '3.3.0'.split('.') | map('int') | list %}bucket_nullable = false {% endif %}count() as c by `kubernetes_namespace_name` | sort - c | head 10"
+      }
+    },
+    {
+      "name": "ppl-q10-filtered-histogram-1h",
+      "operation-type": "raw-request",
+      "path": "/_plugins/_ppl",
+      "method": "POST",
+      "body": {
+        "query": "source = {{index_name | default('k8s_logs')}} | where match(`message`, '{{ common_token | default('failed') }}') and `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | stats count() by span(`_timestamp`, {{ histogram_interval_us | default(3600000000) }}) as ts | sort ts"
+      }
+    }

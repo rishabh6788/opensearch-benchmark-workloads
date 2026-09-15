@@ -1,0 +1,40 @@
+
+{% if distribution_version is not defined %}
+  {% set distribution_version = "2.11.0" %}
+{% endif %}
+
+{
+  "version": 2,
+  "description": "k8s_logs workload: synthetically generated Kubernetes application logs, mirroring the ClickHouse/OpenObserve benchmark corpus and query set",
+  "indices": [
+    {
+      "name": "{{ index_name | default('k8s_logs') }}",
+      "body": "{{ index_body | default('index.json') }}"
+    }
+  ],
+  "corpora": [
+    {
+      "name": "k8s_logs",
+      "base-url": "{{ base_url | default('') }}",
+      "documents": [
+        {
+          {% if document_url is defined %}
+          "source-url": "{{ document_url | safe }}",
+          {% endif %}
+          "source-file": "{{ document_file | default('k8s_logs-documents.json') }}",
+          "document-count": {{ document_count | default(500000000) }},
+          {% if document_compressed_size_in_bytes is defined %}
+          "compressed-bytes": {{ document_compressed_size_in_bytes }},
+          {% endif %}
+          "uncompressed-bytes": {{ document_uncompressed_size_in_bytes | default(1118961329246) }}
+        }
+      ]
+    }
+  ],
+  "operations": [
+    {{ benchmark.collect(parts="operations/*.json") }}
+  ],
+  "test_procedures": [
+    {{ benchmark.collect(parts="test_procedures/*.json") }}
+  ]
+}

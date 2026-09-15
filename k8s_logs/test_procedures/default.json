@@ -1,0 +1,17 @@
+{
+  "name": "k8s_logs",
+  "default": true,
+  "schedule": [
+    {{ benchmark.collect(parts="common/index-only.json") }},
+    {{ benchmark.collect(parts="common/search-schedule.json") }}
+  ]
+},
+{
+  "name": "ppl",
+  "default": false,
+  "description": "Indexes the corpus, then runs the PPL query set. Requires the SQL/PPL plugin.",
+  "schedule": [
+    {{ benchmark.collect(parts="common/index-only.json") }},
+    {{ benchmark.collect(parts="ppl/ppl-schedule.json") }}
+  ]
+}
