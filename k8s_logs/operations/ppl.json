@@ -76,7 +76,7 @@
       "path": "/_plugins/_ppl",
       "method": "POST",
       "body": {
-        "query": "source = {{index_name | default('k8s_logs')}} | where `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | stats count() by span(`_timestamp`, {{ histogram_interval_us | default(3600000000) }}) as ts | sort ts"
+        "query": "source = {{index_name | default('k8s_logs')}} | where `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | eval ts_s = `_timestamp` / 1000000 | stats count() by span(ts_s, {{ histogram_interval_s | default(3600) }}) as ts | sort ts"
       }
     },
     {
@@ -94,6 +94,6 @@
       "path": "/_plugins/_ppl",
       "method": "POST",
       "body": {
-        "query": "source = {{index_name | default('k8s_logs')}} | where match(`message`, '{{ common_token | default('failed') }}') and `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | stats count() by span(`_timestamp`, {{ histogram_interval_us | default(3600000000) }}) as ts | sort ts"
+        "query": "source = {{index_name | default('k8s_logs')}} | where match(`message`, '{{ common_token | default('failed') }}') and `_timestamp` >= {{ ts_gte | default(1780272000000000) }} and `_timestamp` <= {{ ts_lte | default(1811808000000000) }} | eval ts_s = `_timestamp` / 1000000 | stats count() by span(ts_s, {{ histogram_interval_s | default(3600) }}) as ts | sort ts"
       }
     }
