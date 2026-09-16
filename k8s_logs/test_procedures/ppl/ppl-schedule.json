@@ -16,7 +16,21 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "operation": "ppl-q0-trace-id-rows",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
   "operation": "ppl-q1-span-id",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q1-span-id-rows",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -30,7 +44,21 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "operation": "ppl-q2-rare-token-rows",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
   "operation": "ppl-q3-common-token",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q3-common-token-rows",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -44,7 +72,21 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "operation": "ppl-q4-container-and-trace-id-rows",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
   "operation": "ppl-q5-container-and-token",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q5-container-and-token-rows",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
@@ -58,7 +100,21 @@
   "clients": {{ search_clients | default(1) }}
 },
 {
+  "operation": "ppl-q6-double-token-rows",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
   "operation": "ppl-q7-pod-name",
+  "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
+  "iterations": {{ test_iterations | default(100) | tojson }},
+  "target-throughput": {{ target_throughput | default(2) | tojson }},
+  "clients": {{ search_clients | default(1) }}
+},
+{
+  "operation": "ppl-q7-pod-name-rows",
   "warmup-iterations": {{ warmup_iterations | default(200) | tojson }},
   "iterations": {{ test_iterations | default(100) | tojson }},
   "target-throughput": {{ target_throughput | default(2) | tojson }},
