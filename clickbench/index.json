@@ -7,7 +7,6 @@
     "index.search.concurrent_segment_search.mode": {{css_mode | default("auto") | tojson}},
     "index.codec": "best_compression",
     "index.translog.sync_interval": "30s",
-    "index.translog.durability": {{index_translog_durability | default("async") | tojson}},
     "index.sort.field": [ "CounterID", "EventDate", "UserID", "EventTime", "WatchID" ],
     "index.sort.order": [ "desc", "desc", "desc", "desc", "desc" ]
     {%- if parquet_enabled_index is defined and parquet_enabled_index %}
