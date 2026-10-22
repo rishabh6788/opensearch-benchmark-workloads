@@ -58,7 +58,7 @@ cardinality, nested `events`, and mixed span statuses.
 
 | Parameter | Default | Description |
 |---|---|---|
-| `span_index_name` | `otel-v1-apm-span` | Target index |
+| `index_name` | `otel-v1-apm-span` | Target index |
 | `span_scenario` | `basic` | `basic` or `microservices` |
 | `span_service_name` | `otelgen` | Value of `resource.attributes.service@name` |
 | `span_fanout` | `100` | Child spans per trace (`microservices` only) |
@@ -68,7 +68,10 @@ cardinality, nested `events`, and mixed span statuses.
 | `span_route_cardinality` | `200` | Distinct `http.route` templates |
 | `span_faithful` | `false` | Reproduce otelgen's quirks instead of correcting them (see below) |
 | `span_seed` | `42` | RNG seed; each client uses `seed + partition_index` |
-| `span_index_bulk_size` | `999` | Documents per bulk request |
+| `bulk_size` | `999` | Documents per bulk request |
+| `number_of_shards` | `1` | Primary shards; raise to match the cluster under test |
+| `number_of_replicas` | `0` | Replicas |
+| `index_refresh_interval` | `5s` | Managed domains often enforce a 5s floor via `cluster.minimum.index.refresh_interval` |
 
 Near-realtime (`span-nrt`):
 
@@ -76,10 +79,10 @@ Near-realtime (`span-nrt`):
 |---|---|---|
 | `span_ingest_lag_ms` | `2000` | How far behind wall clock a trace's last span ends |
 | `span_lag_jitter_ms` | `500` | Jitter applied to that lag |
-| `nrt_target_throughput` | `20` | **Bulk requests** per second; docs/sec is this times `span_index_bulk_size` |
-| `nrt_indexing_clients` | `8` | Bulk indexing clients |
-| `nrt_warmup_time_period` | `60` | Warmup seconds |
-| `nrt_time_period` | `900` | Measurement seconds |
+| `target_throughput` | `20` | **Bulk requests** per second; docs/sec is this times `bulk_size` |
+| `bulk_indexing_clients` | `8` | Bulk indexing clients |
+| `warmup_time_period` | `60` | Warmup seconds |
+| `time_period` | `900` | Measurement seconds |
 
 Backfill (`span-backfill`):
 
@@ -87,11 +90,11 @@ Backfill (`span-backfill`):
 |---|---|---|
 | `span_clock_mode` | `spread` | `spread` scatters timestamps; `realtime` anchors them near now |
 | `span_time_spread_s` | `86400` | Window to scatter timestamps over |
-| `indexing_clients` | `8` | Bulk indexing clients |
-| `index_iterations` | `1000` | Bulk requests per client |
-| `index_target_throughput` | unset | Leave unset to run at max throughput |
+| `bulk_indexing_clients` | `8` | Bulk indexing clients |
+| `iterations` | `1000` | Bulk requests per client |
+| `target_throughput` | unset | Leave unset to run at max throughput |
 
-Keep `span_index_bulk_size` a multiple of the scenario's spans-per-trace (3 or
+Keep `bulk_size` a multiple of the scenario's spans-per-trace (3 or
 `fanout + 1`); otherwise each request rounds up to a whole number of traces and
 the param source logs a warning. The default of `999` is a multiple of 3.
 
@@ -148,7 +151,7 @@ opensearch-benchmark execute-test \
   --target-hosts localhost:9200 \
   --workload-path ./otel_traces \
   --pipeline benchmark-only \
-  --workload-params span_scenario:microservices,span_index_bulk_size:1010,nrt_indexing_clients:16
+  --workload-params span_scenario:microservices,bulk_size:1010,bulk_indexing_clients:16
 ```
 
 ## Sizing
@@ -179,7 +182,7 @@ codec, so measure it rather than predict it:
 opensearch-benchmark execute-test \
   --target-hosts <host>:9200 --workload-path ./otel_traces \
   --pipeline benchmark-only --test-procedure span-backfill \
-  --workload-params span_scenario:microservices,index_iterations:50000
+  --workload-params span_scenario:microservices,iterations:50000
 
 curl -s '<host>:9200/_cat/indices/otel-v1-apm-span?v&bytes=b&h=docs.count,pri.store.size'
 ```
@@ -196,10 +199,10 @@ ingest-rate tests.
 At multi-terabyte scale a single static index is the wrong shape: size shards
 at 30-50 GB, which puts 100 TB at roughly 2000 shards. That needs rollover or
 date-named indices, which this workload does not yet do — it writes to one
-index named by `span_index_name`.
+index named by `index_name`.
 
-During a long backfill, set `span_index_refresh_interval` high (or `-1`) and
-`target_index_replica_shards: 0`, then restore both before the NRT phase.
+During a long backfill, set `index_refresh_interval` high (or `-1`) and
+`number_of_replicas: 0`, then restore both before the NRT phase.
 
 `spangen.py` has no OpenSearch Benchmark dependency, so the generator can be
 exercised on its own:

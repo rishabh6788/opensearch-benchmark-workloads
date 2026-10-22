@@ -1,11 +1,10 @@
 {
   "settings": {
     "index": {
-      "number_of_shards": {{ target_index_primary_shards | default(1) }},
-      "number_of_replicas": {{ target_index_replica_shards | default(0) }},
-      {#- Managed domains can enforce cluster.minimum.index.refresh_interval
-          (commonly 5s); a lower value makes create-index fail with 400. -#}
-      "refresh_interval": "{{ span_index_refresh_interval | default('5s') }}"
+      "number_of_shards": {{ number_of_shards | default(1) }},
+      "number_of_replicas": {{ number_of_replicas | default(0) }},
+      "queries.cache.enabled": {{query_cache_enabled | default(false) | tojson}},
+      "requests.cache.enable": {{requests_cache_enabled | default(false) | tojson}}
     }
   },
   "mappings": {
