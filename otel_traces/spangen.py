@@ -264,9 +264,23 @@ class TraceGenerator:
         # (traces.go:98-104), so the root outlives its children.
         throttle_ms = self._rng.randrange(50)
 
+        # otelgen's basic.go never calls SetStatus, so every span it emits has
+        # an unset status. That leaves status.code with a single value across
+        # the whole index and makes error_rate a no-op, so outside faithful
+        # mode the failure is modelled: pong fails, and the client span and
+        # root observe it.
+        errored = not self._faithful and self._rng.random() < self._error_rate
+        if self._faithful:
+            code, message = STATUS_UNSET, ""
+        elif errored:
+            code, message = STATUS_ERROR, "ping-pong failed"
+        else:
+            code, message = STATUS_OK, ""
+
         ping_end = start + (ping_ms + pong_ms) * MS
         root = Span(name="basic", kind="SPAN_KIND_INTERNAL",
-                    start=start, end=ping_end + throttle_ms * MS)
+                    start=start, end=ping_end + throttle_ms * MS,
+                    status_code=code, status_message=message)
 
         def peer_attrs(peer):
             attrs = {
@@ -288,6 +302,8 @@ class TraceGenerator:
             start=start,
             end=ping_end,
             parent_span_id=root.span_id,
+            status_code=code,
+            status_message=message,
             attributes={**peer_attrs("ping-pong-server"),
                         **({"span.kind": "client"} if self._faithful else {})},
         )
@@ -297,6 +313,8 @@ class TraceGenerator:
             start=start + ping_ms * MS,
             end=start + (ping_ms + pong_ms) * MS,
             parent_span_id=ping.span_id,
+            status_code=code,
+            status_message=message,
             attributes={**peer_attrs("ping-pong-client"),
                         **({"span.kind": "server"} if self._faithful else {})},
         )
@@ -334,6 +352,11 @@ class TraceGenerator:
 
         spans = [root]
         cursor = start
+        # Drawn independently rather than as "any child errored": with fanout
+        # 100 at a 10% child rate, the latter marks ~99.997% of traces failed
+        # and traceGroupFields.statusCode becomes constant again. A request
+        # fails when a critical-path call fails, not when any fan-out call does.
+        root_errored = not self._faithful and self._rng.random() < self._error_rate
         for _ in range(self._fanout):
             service = self._rng.choice(SERVICES)
             duration = self._rng.randrange(100) * MS
@@ -378,6 +401,14 @@ class TraceGenerator:
             cursor += duration
 
         root.end = cursor
+        # otelgen always marks the root Ok (microservices.go:102), which leaves
+        # traceGroupFields.statusCode constant. Outside faithful mode the root
+        # reflects its children, so trace-level error queries have something to
+        # select on.
+        if root_errored:
+            root.status_code = STATUS_ERROR
+            root.status_message = "downstream operation failed"
+            root.attributes["http.response.status_code"] = self._status_code(errored=True)
         return spans
 
     def _service_attrs(self, service, errored):
