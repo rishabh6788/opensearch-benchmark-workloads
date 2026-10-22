@@ -1,0 +1,38 @@
+{
+    "name": "span-nrt",
+    "description": "Steady-rate near-realtime ingest: span timestamps track wall-clock now, held at a fixed arrival rate for a fixed duration.",
+    "default": true,
+    "schedule": [
+        {{ benchmark.collect(parts="common/create-index-schedule.json") }},
+        {{ benchmark.collect(parts="common/nrt-schedule.json") }}
+    ]
+},
+{
+    "name": "span-backfill",
+    "description": "Max-throughput backfill with timestamps scattered over the trailing time_spread_s. Use to build a historical corpus, not for steady-state measurement.",
+    "default": false,
+    "schedule": [
+        {{ benchmark.collect(parts="common/create-index-schedule.json") }},
+        {{ benchmark.collect(parts="common/backfill-schedule.json") }}
+    ]
+},
+{
+    "name": "span-backfill-then-nrt",
+    "description": "Backfill a historical corpus, then measure near-realtime ingest on top of it.",
+    "default": false,
+    "schedule": [
+        {{ benchmark.collect(parts="common/create-index-schedule.json") }},
+        {{ benchmark.collect(parts="common/backfill-schedule.json") }},
+        {{ benchmark.collect(parts="common/nrt-schedule.json") }}
+    ]
+},
+{
+    "name": "span-backfill-with-merge",
+    "description": "Backfill, then force-merge the index.",
+    "default": false,
+    "schedule": [
+        {{ benchmark.collect(parts="common/create-index-schedule.json") }},
+        {{ benchmark.collect(parts="common/backfill-schedule.json") }},
+        {{ benchmark.collect(parts="common/force-merge-schedule.json") }}
+    ]
+}

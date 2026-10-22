@@ -1,0 +1,17 @@
+{% import "benchmark.helpers" as benchmark with context %}
+{
+  "version": 2,
+  "description": "Benchmark trace-analytics ingest with synthetic OpenTelemetry spans in Data Prepper's raw-span schema. Documents are generated in-process, so no corpus download and no collector or Data Prepper pipeline is required.",
+  "indices": [
+    {
+      "name": "{{ span_index_name | default('otel-v1-apm-span') }}",
+      "body": "{{ span_index_body | default('indices/otel-v1-apm-span.json') }}"
+    }
+  ],
+  "operations": [
+    {{ benchmark.collect(parts="operations/*.json") }}
+  ],
+  "test_procedures": [
+    {{ benchmark.collect(parts="test_procedures/*.json") }}
+  ]
+}

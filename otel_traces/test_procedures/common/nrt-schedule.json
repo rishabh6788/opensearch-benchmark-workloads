@@ -1,0 +1,25 @@
+{
+    "operation": {
+        "name": "otel-span-nrt-indexing",
+        "operation-type": "bulk",
+        "param-source": "otel-span-bulk-param-source",
+        "index_name": "{{ span_index_name | default('otel-v1-apm-span') }}",
+        "scenario": "{{ span_scenario | default('basic') }}",
+        "service_name": "{{ span_service_name | default('otelgen') }}",
+        "fanout": {{ span_fanout | default(100) | int }},
+        "error_rate": {{ span_error_rate | default(0.1) }},
+        "faithful": {{ span_faithful | default(false) | tojson }},
+        "seed": {{ span_seed | default(42) | int }},
+        "bulk-size": {{ span_index_bulk_size | default(999) | int }},
+        "client_ip_cardinality": {{ span_client_ip_cardinality | default(100000) | int }},
+        "peer_ip_cardinality": {{ span_peer_ip_cardinality | default(10000) | int }},
+        "route_cardinality": {{ span_route_cardinality | default(200) | int }},
+        "clock_mode": "realtime",
+        "ingest_lag_ms": {{ span_ingest_lag_ms | default(2000) | int }},
+        "lag_jitter_ms": {{ span_lag_jitter_ms | default(500) | int }}
+    },
+    "clients": {{ nrt_indexing_clients | default(8) | int }},
+    "warmup-time-period": {{ nrt_warmup_time_period | default(60) | int }},
+    "time-period": {{ nrt_time_period | default(900) | int }},
+    "target-throughput": {{ nrt_target_throughput | default(0) }}
+}

@@ -1,0 +1,6 @@
+{
+    "operation": "delete-span-index"
+},
+{
+    "operation": "create-span-index"
+}

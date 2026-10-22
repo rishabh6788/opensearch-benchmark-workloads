@@ -1,0 +1,28 @@
+{
+    "operation": {
+        "name": "otel-span-backfill",
+        "operation-type": "bulk",
+        "param-source": "otel-span-bulk-param-source",
+        "index_name": "{{ span_index_name | default('otel-v1-apm-span') }}",
+        "scenario": "{{ span_scenario | default('basic') }}",
+        "service_name": "{{ span_service_name | default('otelgen') }}",
+        "fanout": {{ span_fanout | default(100) | int }},
+        "error_rate": {{ span_error_rate | default(0.1) }},
+        "faithful": {{ span_faithful | default(false) | tojson }},
+        "seed": {{ span_seed | default(42) | int }},
+        "bulk-size": {{ span_index_bulk_size | default(999) | int }},
+        "client_ip_cardinality": {{ span_client_ip_cardinality | default(100000) | int }},
+        "peer_ip_cardinality": {{ span_peer_ip_cardinality | default(10000) | int }},
+        "route_cardinality": {{ span_route_cardinality | default(200) | int }},
+        "clock_mode": "{{ span_clock_mode | default('spread') }}",
+        "time_spread_s": {{ span_time_spread_s | default(86400) | int }}
+    },
+    "clients": {{ indexing_clients | default(8) | int }},
+    "iterations": {{ index_iterations | default(1000) | int }}
+    {%- if index_target_throughput is defined %}
+    ,"target-throughput": {{ index_target_throughput }}
+    {%- endif %}
+},
+{
+    "operation": "refresh-span-index"
+}
