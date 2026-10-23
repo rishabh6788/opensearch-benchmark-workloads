@@ -15,6 +15,7 @@ This module has no OpenSearch Benchmark dependency so it can be exercised and
 unit tested standalone; ``workload.py`` wraps it in a ParamSource.
 """
 
+import math
 import secrets
 import time
 from dataclasses import dataclass, field
@@ -149,7 +150,7 @@ class TraceGenerator:
                  faithful=False, instance_id="benchmark-instance",
                  clock_mode="realtime", ingest_lag_ms=2000, lag_jitter_ms=500,
                  client_ip_cardinality=100_000, peer_ip_cardinality=10_000,
-                 route_cardinality=200):
+                 route_cardinality=200, duration_median_ms=15, duration_sigma=1.1):
         if scenario not in SCENARIOS:
             raise ValueError(f"unknown scenario {scenario!r}, expected one of {SCENARIOS}")
         if clock_mode not in CLOCK_MODES:
@@ -162,6 +163,10 @@ class TraceGenerator:
                 f"peer_ip_cardinality must be in 1..{PEER_IP_RANGE} (size of 10.0.0.0/8)")
         if route_cardinality < 1:
             raise ValueError("route_cardinality must be >= 1")
+        if duration_median_ms <= 0:
+            raise ValueError("duration_median_ms must be > 0")
+        if duration_sigma <= 0:
+            raise ValueError("duration_sigma must be > 0")
         self._rng = rng
         self._scenario = scenario
         self._service_name = service_name
@@ -176,6 +181,25 @@ class TraceGenerator:
         self._client_ip_cardinality = client_ip_cardinality
         self._peer_ip_cardinality = peer_ip_cardinality
         self._route_cardinality = route_cardinality
+        self._duration_median_ms = duration_median_ms
+        self._duration_sigma = duration_sigma
+
+    def _duration(self):
+        """A span's duration, in nanoseconds.
+
+        otelgen sleeps rand.Intn(100) whole milliseconds. That quantises every
+        duration to 1 ms (only 100 distinct values), emits ~1% zero-length
+        spans, and -- summed over `fanout` children -- gives roots a
+        near-constant duration with no latency tail at all, so p50 == p99.
+
+        Outside faithful mode durations are log-normal, which is how real span
+        latencies are distributed: a tight body with a long right tail.
+        """
+        if self._faithful:
+            return self._rng.randrange(100) * MS
+        mu = math.log(self._duration_median_ms * MS)
+        # Floor at 1us so no span is zero-length.
+        return max(int(self._rng.lognormvariate(mu, self._duration_sigma)), 1_000)
 
     def _client_ip(self):
         if self._faithful:
@@ -256,13 +280,14 @@ class TraceGenerator:
         """Port of BasicScenario (basic.go). root -> ping -> pong, where ping
         *encloses* pong because the Go code defers its End()."""
         start = 0
-        ping_ms = self._rng.randrange(100)
-        pong_ms = self._rng.randrange(100)
+        ping_ns = self._duration()
+        pong_ns = self._duration()
 
         # otelgen folds the rate-limiter wait into the root span: it calls
         # limiter.Wait() after the scenario but before root.End()
         # (traces.go:98-104), so the root outlives its children.
-        throttle_ms = self._rng.randrange(50)
+        # The limiter wait is scheduler time, not work, so it stays uniform.
+        throttle_ns = self._rng.randrange(50) * MS
 
         # otelgen's basic.go never calls SetStatus, so every span it emits has
         # an unset status. That leaves status.code with a single value across
@@ -277,9 +302,9 @@ class TraceGenerator:
         else:
             code, message = STATUS_OK, ""
 
-        ping_end = start + (ping_ms + pong_ms) * MS
+        ping_end = start + ping_ns + pong_ns
         root = Span(name="basic", kind="SPAN_KIND_INTERNAL",
-                    start=start, end=ping_end + throttle_ms * MS,
+                    start=start, end=ping_end + throttle_ns,
                     status_code=code, status_message=message)
 
         def peer_attrs(peer):
@@ -310,8 +335,8 @@ class TraceGenerator:
         pong = Span(
             name="pong",
             kind="SPAN_KIND_INTERNAL" if self._faithful else "SPAN_KIND_SERVER",
-            start=start + ping_ms * MS,
-            end=start + (ping_ms + pong_ms) * MS,
+            start=start + ping_ns,
+            end=start + ping_ns + pong_ns,
             parent_span_id=ping.span_id,
             status_code=code,
             status_message=message,
@@ -359,7 +384,7 @@ class TraceGenerator:
         root_errored = not self._faithful and self._rng.random() < self._error_rate
         for _ in range(self._fanout):
             service = self._rng.choice(SERVICES)
-            duration = self._rng.randrange(100) * MS
+            duration = self._duration()
             errored = self._rng.random() < self._error_rate
             attrs = {
                 "service.name": f"{self._service_name}_{service}",

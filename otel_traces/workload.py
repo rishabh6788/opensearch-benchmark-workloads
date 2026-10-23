@@ -43,6 +43,8 @@ class OtelSpanBulkParamSource(ParamSource):
         self._client_ip_cardinality = params.get("client_ip_cardinality", 100_000)
         self._peer_ip_cardinality = params.get("peer_ip_cardinality", 10_000)
         self._route_cardinality = params.get("route_cardinality", 200)
+        self._duration_median_ms = params.get("duration_median_ms", 15)
+        self._duration_sigma = params.get("duration_sigma", 1.1)
         self._seed = params.get("seed", 42)
         self._generator = self._build_generator(self._seed)
 
@@ -70,6 +72,8 @@ class OtelSpanBulkParamSource(ParamSource):
             client_ip_cardinality=self._client_ip_cardinality,
             peer_ip_cardinality=self._peer_ip_cardinality,
             route_cardinality=self._route_cardinality,
+            duration_median_ms=self._duration_median_ms,
+            duration_sigma=self._duration_sigma,
         )
 
     def partition(self, partition_index, total_partitions):

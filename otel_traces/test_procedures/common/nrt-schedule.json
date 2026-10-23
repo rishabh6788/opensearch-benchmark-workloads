@@ -14,6 +14,8 @@
         "client_ip_cardinality": {{ span_client_ip_cardinality | default(100000) | int }},
         "peer_ip_cardinality": {{ span_peer_ip_cardinality | default(10000) | int }},
         "route_cardinality": {{ span_route_cardinality | default(200) | int }},
+        "duration_median_ms": {{ span_duration_median_ms | default(15) | int }},
+        "duration_sigma": {{ span_duration_sigma | default(1.1) }},
         "clock_mode": "realtime",
         "ingest_lag_ms": {{ span_ingest_lag_ms | default(2000) | int }},
         "lag_jitter_ms": {{ span_lag_jitter_ms | default(500) | int }}
