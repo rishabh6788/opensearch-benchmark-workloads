@@ -3,10 +3,49 @@
     "version": 2,
     "description": "Benchmark vector search engine performance for different engine types like faiss, lucene and nmslib",
     "indices": [
+        {%- set ns = namespace(sep="") %}
+        {%- if target_index_name is defined %}{{ ns.sep }}
         {
-            "name": "{{ target_index_name | default('target_index') }}",
+            "name": "{{ target_index_name }}",
             "body": "{{ target_index_body }}"
         }
+        {%- set ns.sep = "," %}
+        {%- endif %}
+        {%- if train_index_name is defined %}{{ ns.sep }}
+        {
+            "name": "{{ train_index_name }}",
+            "body": "{{ train_index_body }}"
+        }
+        {%- set ns.sep = "," %}
+        {%- endif %}
+        {%- if faiss_fp32_index_name is defined %}{{ ns.sep }}
+        {
+            "name": "{{ faiss_fp32_index_name }}",
+            "body": "{{ faiss_fp32_index_body | default('indices/faiss-index.json') }}"
+        }
+        {%- set ns.sep = "," %}
+        {%- endif %}
+        {%- if faiss_sq_index_name is defined %}{{ ns.sep }}
+        {
+            "name": "{{ faiss_sq_index_name }}",
+            "body": "{{ faiss_sq_index_body | default('indices/faiss-sq-index.json') }}"
+        }
+        {%- set ns.sep = "," %}
+        {%- endif %}
+        {%- if lucene_fp32_index_name is defined %}{{ ns.sep }}
+        {
+            "name": "{{ lucene_fp32_index_name }}",
+            "body": "{{ lucene_fp32_index_body | default('indices/lucene-index.json') }}"
+        }
+        {%- set ns.sep = "," %}
+        {%- endif %}
+        {%- if lucene_sq_index_name is defined %}{{ ns.sep }}
+        {
+            "name": "{{ lucene_sq_index_name }}",
+            "body": "{{ lucene_sq_index_body | default('indices/lucene-sq-index.json') }}"
+        }
+        {%- set ns.sep = "," %}
+        {%- endif %}
     ],
     "corpora": [
     {
@@ -18,7 +57,7 @@
           "source-file": "documents-1k.hdf5.bz2",
           "source-format": "hdf5",
           "document-count": 1000
-          
+
         }
       ]
     },
@@ -29,6 +68,18 @@
       "documents": [
         {
           "source-file": "documents-100k.hdf5.bz2",
+          "source-format": "hdf5",
+          "document-count": 100000
+        }
+      ]
+    },
+    {
+      "name": "cohere-100k-radial",
+      "base-url": "https://dbyiw3u3rf9yr.cloudfront.net/corpora/vectorsearch/cohere-wikipedia-22-12-en-embeddings",
+      "target-index": "{{ target_index_name }}",
+      "documents": [
+        {
+          "source-file": "cohere-100k-radial.hdf5",
           "source-format": "hdf5",
           "document-count": 100000
         }
@@ -90,7 +141,7 @@
         {
           "source-file": "cohere-10m-nested-uniform.hdf5",
           "source-format": "hdf5",
-          "document-count": 10550122
+          "document-count": 10550170
         }
       ]
     },

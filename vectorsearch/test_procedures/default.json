@@ -44,6 +44,24 @@
     ]
 },
 {
+    "name": "filter-percentage-sweep",
+    "default": false,
+    "description": "Index once, then run radial filtered search at each percentage in filter_percentages.",
+    "schedule": [
+       {{ benchmark.collect(parts="common/index-only-schedule.json") }},
+       {{ benchmark.collect(parts="common/force-merge-schedule.json") }},
+       {{ benchmark.collect(parts="common/filter-percentage-sweep-schedule.json") }}
+    ]
+},
+{
+    "name": "filter-percentage-sweep-search-only",
+    "default": false,
+    "description": "Radial filtered search at each percentage in filter_percentages on a previously indexed cluster.",
+    "schedule": [
+       {{ benchmark.collect(parts="common/filter-percentage-sweep-schedule.json") }}
+    ]
+},
+{
     "name": "force-merge-index",
     "default": false,
     "description": "Force merge vector search index to improve search performance",
@@ -58,6 +76,14 @@
     "schedule": [
        {{ benchmark.collect(parts="aoss/index-only-schedule.json") }},
        {{ benchmark.collect(parts="aoss/search-only-schedule.json") }}
+    ]
+},
+{
+    "name": "timed-search-aoss",
+    "description": "AOSS: search a previously indexed collection for time_period seconds. Queries repeat until the time is up, so the time ends the task, not the query set.",
+    "default": false,
+    "schedule": [
+       {{ benchmark.collect(parts="aoss/timed-search-schedule.json") }}
     ]
 },
 {
@@ -236,69 +262,171 @@
           "operation": "refresh-target-index"
         }
     ]
-},
+}
+,
 {
-    "name": "filter-percentage-sweep",
+    "name": "index-settings",
     "default": false,
-    "description": "Index once, then run radial filtered search at each percentage in filter_percentages.",
+    "description": "PUT index_settings to the target index's _settings. Dynamic settings only; static settings need a closed index.",
     "schedule": [
-       {{ benchmark.collect(parts="common/index-only-schedule.json") }},
-       {{ benchmark.collect(parts="common/force-merge-schedule.json") }},
-       {{ benchmark.collect(parts="common/filter-percentage-sweep-schedule.json") }}
-    ]
-},
-{
-    "name": "filter-percentage-sweep-search-only",
-    "default": false,
-    "description": "Radial filtered search at each percentage in filter_percentages on a previously indexed cluster.",
-    "schedule": [
-       {{ benchmark.collect(parts="common/filter-percentage-sweep-schedule.json") }}
-    ]
-},
-{
-  "name": "restore-from-snapshot",
-  "description": "Index vector search which does not use an algorithm that requires training.",
-  "default": false,
-  "schedule": [
-    {
-      "name": "register-snapshot-repository",
-      "operation": {
-        "operation-type": "create-snapshot-repository",
-        "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
-        "body": {
-          "type": "s3",
-          "settings": {
-            "bucket": {{ snapshot_bucket_name | default('test-snapshot-bucket') | tojson }},
-            "region": {{ snapshot_region | default('us-east-1') | tojson }},
-            "base_path": {{ snapshot_base_path | default('test-base-path') | tojson }}
-          }
+        {
+            "operation": {
+                "name": "put-index-settings",
+                "operation-type": "raw-request",
+                "method": "PUT",
+                "path": "/{{ target_index_name | default('target_index') }}/_settings",
+                "body": {{ index_settings | default({}) | tojson }}
+            }
         }
-      }
-    },
-    {
-      "name": "restore-from-snapshot",
-      "operation": {
-        "operation-type": "restore-snapshot",
-        "repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
-        "snapshot": {{ snapshot_name | default('test-snapshot') | tojson }},
-        "body": {
-          "index_settings": {
-            "index.number_of_replicas": {{ number_of_replicas | default(0) }}
-          }
+    ]
+},
+{
+    "name": "cluster-settings",
+    "default": false,
+    "description": "PUT cluster_settings as persistent cluster settings.",
+    "schedule": [
+        {
+            "operation": {
+                "name": "put-cluster-settings",
+                "operation-type": "put-settings",
+                "body": {"persistent": {{ cluster_settings | default({}) | tojson }}}
+            }
+        }
+    ]
+},
+{
+    "name": "snapshot-create",
+    "default": false,
+    "description": "Register snapshot_repository and snapshot the target index into it as snapshot_name.",
+    "schedule": [
+        {
+            "operation": {
+                "name": "register-snapshot-repository",
+                "operation-type": "create-snapshot-repository",
+                "repository": "{{ snapshot_repository | default('bench-snapshots') }}",
+                "body": {
+                    "type": "{{ snapshot_repository_type | default('s3') }}",
+                    "settings": {{ snapshot_repository_settings | default({}) | tojson }}
+                }
+            }
         },
-        "wait-for-completion": false
-      }
-    },
-    {
-      "name": "wait-for-snapshot-recovery",
-      "operation": {
-        "operation-type": "wait-for-recovery",
-        "request-timeout": 3600,
-        "index": "target_index"
-      }
-    },
-    {{ benchmark.collect(parts="common/index-only-schedule.json") }},
-    {{ benchmark.collect(parts="common/force-merge-schedule.json") }},
-    {{ benchmark.collect(parts="common/search-only-schedule.json") }}
-  ]
+        {
+            "operation": {
+                "name": "create-snapshot",
+                "operation-type": "create-snapshot",
+                "repository": "{{ snapshot_repository | default('bench-snapshots') }}",
+                "snapshot": "{{ snapshot_name | default('target-index-snapshot') }}",
+                "wait-for-completion": false,
+                "body": {
+                    "indices": "{{ target_index_name | default('target_index') }}",
+                    "include_global_state": false
+                }
+            }
+        },
+        {
+            "operation": {
+                "name": "wait-for-snapshot",
+                "operation-type": "wait-for-snapshot-create",
+                "repository": "{{ snapshot_repository | default('bench-snapshots') }}",
+                "snapshot": "{{ snapshot_name | default('target-index-snapshot') }}",
+                "completion-recheck-wait-period": 5,
+                "include-in-reporting": true
+            }
+        }
+    ]
+},
+{
+    "name": "snapshot-restore",
+    "default": false,
+    "description": "Delete the target index, restore it from snapshot_name in snapshot_repository, and wait for recovery.",
+    "schedule": [
+        {
+            "operation": {
+                "name": "register-snapshot-repository",
+                "operation-type": "create-snapshot-repository",
+                "repository": "{{ snapshot_repository | default('bench-snapshots') }}",
+                "body": {
+                    "type": "{{ snapshot_repository_type | default('s3') }}",
+                    "settings": {{ snapshot_repository_settings | default({}) | tojson }}
+                }
+            }
+        },
+        {
+            "operation": {
+                "name": "delete-target-index-before-restore",
+                "operation-type": "delete-index",
+                "only-if-exists": true,
+                "index": "{{ target_index_name | default('target_index') }}"
+            }
+        },
+        {
+            "operation": {
+                "name": "restore-snapshot",
+                "operation-type": "restore-snapshot",
+                "repository": "{{ snapshot_repository | default('bench-snapshots') }}",
+                "snapshot": "{{ snapshot_name | default('target-index-snapshot') }}",
+                "wait-for-completion": false,
+                "body": {
+                    "indices": "{{ target_index_name | default('target_index') }}",
+                    "include_global_state": false
+                }
+            }
+        },
+        {
+            "operation": {
+                "name": "wait-for-restore-recovery",
+                "operation-type": "wait-for-recovery",
+                "index": "{{ target_index_name | default('target_index') }}",
+                "completion-recheck-wait-period": 5,
+                "include-in-reporting": true
+            }
+        }
+    ]
+},
+{
+"name": "restore-from-snapshot",
+"description": "Index vector search which does not use an algorithm that requires training.",
+"default": false,
+"schedule": [
+{
+"name": "register-snapshot-repository",
+"operation": {
+"operation-type": "create-snapshot-repository",
+"repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
+"body": {
+"type": "s3",
+"settings": {
+"bucket": {{ snapshot_bucket_name | default('test-snapshot-bucket') | tojson }},
+"region": {{ snapshot_region | default('us-east-1') | tojson }},
+"base_path": {{ snapshot_base_path | default('test-base-path') | tojson }}
+}
+}
+}
+},
+{
+"name": "restore-from-snapshot",
+"operation": {
+"operation-type": "restore-snapshot",
+"repository": {{ snapshot_repo_name | default('test-snapshot-repo') | tojson }},
+"snapshot": {{ snapshot_name | default('test-snapshot') | tojson }},
+"body": {
+"index_settings": {
+"index.number_of_replicas": {{ number_of_replicas | default(0) }}
+}
+},
+"wait-for-completion": false
+}
+},
+{
+"name": "wait-for-snapshot-recovery",
+"operation": {
+"operation-type": "wait-for-recovery",
+"request-timeout": 3600,
+"index": "target_index"
+}
+},
+{{ benchmark.collect(parts="common/index-only-schedule.json") }},
+{{ benchmark.collect(parts="common/force-merge-schedule.json") }},
+{{ benchmark.collect(parts="common/search-only-schedule.json") }}
+]
 }
