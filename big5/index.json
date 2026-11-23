@@ -19,6 +19,7 @@
     {% endif %}
     "index.codec": "best_compression",
     "index.translog.sync_interval": "30s",
+    "index.refresh_interval": "{{refresh_interval | default('10s')}}",
     "index.translog.durability": {{index_translog_durability | default("async") | tojson}},
     {% if index_sort | default(false) %}
     "index.sort.field": "@timestamp",
